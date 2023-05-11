@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from app import get_db
+# from app import get_db
 import app.schema as s
 from app.logger import log
 
