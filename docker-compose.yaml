@@ -1,47 +1,37 @@
 version: "3.8"
+
 services:
-  db:
-    image: postgres:12
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      PGUSER: ${DATABASE_USERNAME}
-      PGDATABASE: ${DATABASE_NAME}
-      PGPASSWORD: ${DATABASE_PASSWORD}
-    ports:
-      - 127.0.0.1:${DATABASE_LOCAL_PORT}:5432
-    restart: always
 
-  backup:
-    build: pg-backup/
-    image: 270968290167.dkr.ecr.eu-west-2.amazonaws.com/fmc-db-backup
+  mongo:
+    image: mongo
     restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-user}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-pass}
     volumes:
-      - ./backup:/backup
-    links:
-      - db
-    environment:
-      SCHEDULE: "@daily"
-      POSTGRES_DATABASE: ${DATABASE_NAME}
-      POSTGRES_HOST: db
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_EXTRA_OPTS: "--schema=public --blobs"
-      DAYS_HISTORY: 7
-
-  app:
-    build: .
-    restart: always
-    command: bash ./start_server.sh
-    environment:
-      DATABASE_URI: ${PROD_DATABASE_URI}
+      - db_data:/data/db
     ports:
-      - 127.0.0.1:8008:80
-    depends_on:
-      - db
+      - 127.0.0.1:27017:27017
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 127.0.0.1:8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME:-user}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-pass}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo:27017/
+
+  # app:
+  #   build: .
+  #   restart: always
+  #   command: bash ./start_server.sh
+  #   environment:
+  #     DB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo/oculo
+  #   ports:
+  #     - 127.0.0.1:${APP_LOCAL_PORT:-8000}:80
+
 
 volumes:
   db_data:
