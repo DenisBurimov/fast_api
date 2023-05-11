@@ -10,9 +10,9 @@
             "request": "launch",
             "module": "uvicorn",
             "envFile": "${workspaceFolder}/.env",
-            "env": {
-                "DATABASE_URI": "${env:DEV_DATABASE_URI}",
-            },
+            // "env": {
+            //     "DB_URI": "${env:DB_URI}",
+            // },
             "args": [
                 "app.main:app"
             ],
