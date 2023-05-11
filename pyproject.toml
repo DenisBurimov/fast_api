@@ -4,7 +4,6 @@ version = "0.1.0"
 description = ""
 authors = ["denys <denysburimov@gmai.com>"]
 readme = "README.md"
-packages = [{include = "oculo_fast_api"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -17,6 +16,7 @@ jose = "^1.0.0"
 invoke = "^2.1.1"
 ipython = "^8.13.2"
 passlib = "^1.7.4"
+bcrypt = "^4.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
