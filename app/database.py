@@ -2,9 +2,10 @@ from typing import Generator
 
 from pymongo import MongoClient
 from pymongo.database import Database
-from app.config import Settings, get_settings
 
-settings: Settings = get_settings()
+from .config import get_settings
+
+settings = get_settings()
 
 mongo = MongoClient(settings.MONGO_URI)
 

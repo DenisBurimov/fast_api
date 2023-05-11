@@ -1,3 +1,3 @@
 # flake8: noqa F401
-from .user import User, Users
+from .user import User, Users, UserDB, UserLogin
 from .token import Token, TokenData

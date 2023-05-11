@@ -5,14 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Create Admin",
+            "type": "python",
+            "request": "launch",
+            "module": "invoke",
+            "args": [
+                "create-superuser"
+            ],
+            "justMyCode": true
+        },
+        {
             "name": "Python: FastAPI",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
             "envFile": "${workspaceFolder}/.env",
-            // "env": {
-            //     "DB_URI": "${env:DB_URI}",
-            // },
             "args": [
                 "app.main:app"
             ],

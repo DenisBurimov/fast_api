@@ -1,23 +1,23 @@
 from invoke import task
 
-from app.logger import log
-from app.database import get_db
-from app.model import SuperUser
-
-db = get_db().__next__()
-
-
-SU_EMAIL = "admin@gmail.com"
-SU_PASSWORD = "password"
-
 
 @task
 def create_superuser(_):
-    su = db.query(SuperUser).filter_by(email=SU_EMAIL).first()
-    if not su:
-        su = SuperUser(email=SU_EMAIL, username=SU_EMAIL, password=SU_PASSWORD)
-        db.add(su)
-        db.commit()
-        log(log.INFO, "SuperUser %s created", SU_EMAIL)
+    """Adds admin(default) user"""
+    from app.logger import log
+    from app import get_db, get_settings, make_hash
+    from app import schema as s
+
+    db = next(get_db())
+    cfg = get_settings()
+
+    if db["user"].find_one({"email": cfg.ADMIN_EMAIL}):
+        log(log.WARNING, "SuperUser -%s already exists", cfg.ADMIN_EMAIL)
     else:
-        log(log.WARNING, "SuperUser -%s already exists", SU_EMAIL)
+        user = s.UserDB(
+            username=cfg.ADMIN_USER,
+            email=cfg.ADMIN_EMAIL,
+            password_hash=make_hash(cfg.ADMIN_PASS),
+        )
+        db["user"].insert_one(user.dict())
+        log(log.INFO, "SuperUser %s created", cfg.ADMIN_EMAIL)
