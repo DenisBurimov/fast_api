@@ -12,17 +12,20 @@ uvicorn = "^0.22.0"
 pymongo = "^4.3.3"
 email-validator = "^2.0.0.post2"
 python-dotenv = "^1.0.0"
-jose = "^1.0.0"
 invoke = "^2.1.1"
 ipython = "^8.13.2"
 passlib = "^1.7.4"
 bcrypt = "^4.0.1"
+python-jose = "^3.3.0"
+python-multipart = "^0.0.6"
 
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
 flake8 = "^6.0.0"
 black = "^23.3.0"
+pytest-mock-resources = {extras = ["mongo"], version = "^2.6.12"}
+httpx = "^0.24.0"
 
 [build-system]
 requires = ["poetry-core"]

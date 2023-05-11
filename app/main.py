@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from app.router import router
 from app.config import Settings, get_settings
 
-settings = get_settings()
+settings: Settings = get_settings()
 
 
 app = FastAPI()

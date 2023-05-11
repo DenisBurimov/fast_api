@@ -13,7 +13,6 @@ def get_test_settings() -> Settings:
 pytest_plugins = [
     "tests.fixture.db",
     "tests.fixture.client",
-    "tests.fixture.mail_client",
     "tests.fixture.test_data",
 ]
 

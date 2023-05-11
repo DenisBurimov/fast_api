@@ -1,41 +1,25 @@
-from sqlalchemy.orm import Session
-
+from pymongo.database import Database
+from app import schema as s, get_settings, make_hash
 from tests.fixture import TestData
 
-import app.model as m
 
-
-def create_test_superuser(db, test_data):
-    db.add(
-        m.SuperUser(
-            email=test_data.test_superuser.email,
-            username=test_data.test_superuser.email,
-            password=test_data.test_superuser.password,
-        )
+def create_test_superuser(db: Database, test_data):
+    cfg = get_settings()
+    user = s.UserDB(
+        username=cfg.ADMIN_USER,
+        email=test_data.test_superuser.email,
+        password_hash=make_hash(test_data.test_superuser.password),
     )
-    db.commit()
+    db.users.insert_one(user.dict())
 
 
-def fill_db_by_test_data(db: Session, test_data: TestData):
+def fill_db_by_test_data(db: Database, test_data: TestData):
     print("Filling up db with fake data")
     create_test_superuser(db, test_data)
     for u in test_data.test_users:
-        db.add(
-            m.User(
-                username=u.username,
-                email=u.email,
-                password=u.password,
-                is_verified=u.is_verified,
-            )
+        user = s.UserDB(
+            username=u.username,
+            email=u.email,
+            password_hash=make_hash(u.password),
         )
-        db.commit()
-    for u in test_data.test_authorized_users:
-        db.add(
-            m.User(
-                username=u.username,
-                email=u.email,
-                password=u.password,
-                is_verified=u.is_verified,
-            )
-        )
-        db.commit()
+        db.users.insert_one(user.dict())
