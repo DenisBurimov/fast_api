@@ -24,8 +24,8 @@ python-multipart = "^0.0.6"
 pytest = "^7.3.1"
 flake8 = "^6.0.0"
 black = "^23.3.0"
-pytest-mock-resources = {extras = ["mongo"], version = "^2.6.12"}
 httpx = "^0.24.0"
+mongomock = "^4.1.2"
 
 [build-system]
 requires = ["poetry-core"]
