@@ -45,6 +45,7 @@ def get_user_by_id(
 @user_router.put("/{id}", response_model=s.UserOutput)
 def get_update_user(
     id: str,
+    data: s.UserUpdate,
     db: Database = Depends(get_db),
     # current_user: int = Depends(get_current_user),
 ):
@@ -52,13 +53,7 @@ def get_update_user(
     if not user:
         raise HTTPException(status_code=404, detail="This user was not found")
 
-    data = s.UserUpdate(
-        username="New Username",
-        email=user.get("email"),
-        password_hash=user.get("password_hash"),
-    ).dict()
-
-    db.users.update_one({"id": ObjectId(id)}, {"$set": data})
+    db.users.update_one({"id": ObjectId(id)}, {"$set": data.dict()})
 
     return s.UserOutput(
         id=str(user.get("id")),
