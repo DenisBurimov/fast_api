@@ -52,14 +52,12 @@ def get_update_user(
     if not user:
         raise HTTPException(status_code=404, detail="This user was not found")
 
-    data = s.UserDB(
-        id=ObjectId(id),
+    data = s.UserUpdate(
         username="New Username",
         email=user.get("email"),
         password_hash=user.get("password_hash"),
     ).dict()
 
-    # db.users.update_one({"id": ObjectId(id)}, {"$set": {"username": "New Username"}})
     db.users.update_one({"id": ObjectId(id)}, {"$set": data})
 
     return s.UserOutput(
