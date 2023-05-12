@@ -36,3 +36,7 @@ class UserDB(BaseModel):
 
 class Users(BaseModel):
     users: list[UserOutput]
+
+
+class DeleteMessage(BaseModel):
+    message: str

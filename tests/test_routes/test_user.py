@@ -36,3 +36,11 @@ def test_get_user_by_id(client: TestClient, db: Database, test_data: TestData):
     test_user_id = str(test_user.get("id"))
     response = client.get(f"api/user/{test_user_id}")
     assert response and response.status_code == 200
+
+
+def test_delete_user(client: TestClient, db: Database, test_data: TestData):
+    test_user = db.users.find_one()
+    
+    test_user_id = str(test_user.get("id"))
+    response = client.delete(f"api/user/{test_user_id}")
+    assert response and response.status_code == 200

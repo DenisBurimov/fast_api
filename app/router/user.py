@@ -38,3 +38,17 @@ def get_user_by_id(
         raise HTTPException(status_code=404, detail="This user was not found")
 
     return s.UserOutput(id=str(user.get("id")), username=user.get("username"), email=user.get("email"), password_hash=user.get("password_hash"),)
+
+
+@user_router.delete("/{id}", response_model=s.DeleteMessage)
+def get_delete_user(
+    id: str,
+    db: Database = Depends(get_db),
+    # current_user: int = Depends(get_current_user),
+):
+    user = db.users.delete_one({"id": ObjectId(id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="This user was not found")
+    
+    message = f"User {id} was successfully deleted"
+    return s.DeleteMessage(message=message)
