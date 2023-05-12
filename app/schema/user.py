@@ -20,8 +20,14 @@ class UserOutput(BaseModel):
     username: str
     email: EmailStr
     password_hash: str
-    
-    
+
+
+class UserUpdate(BaseModel):
+    username: str
+    email: EmailStr
+    password_hash: str
+
+
 class UserDB(BaseModel):
     id: PyObjectId | None = Field(default_factory=PyObjectId, alias="_id")
     username: str
