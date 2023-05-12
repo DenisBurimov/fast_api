@@ -40,6 +40,21 @@ def get_user_by_id(
     return s.UserOutput(id=str(user.get("id")), username=user.get("username"), email=user.get("email"), password_hash=user.get("password_hash"),)
 
 
+@user_router.put("/{id}", response_model=s.UserOutput)
+def get_update_user(
+    id: str,
+    db: Database = Depends(get_db),
+    # current_user: int = Depends(get_current_user),
+):
+    user = db.users.find_one({"id": ObjectId(id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="This user was not found")
+    
+    ...
+
+    return s.UserOutput(id=str(user.get("id")), username=user.get("username"), email=user.get("email"), password_hash=user.get("password_hash"),)
+
+
 @user_router.delete("/{id}", response_model=s.DeleteMessage)
 def get_delete_user(
     id: str,
