@@ -10,15 +10,18 @@ class User(BaseModel):
     password: str
 
 
-class Users(BaseModel):
-    users: list[User]
-
-
 class UserLogin(BaseModel):
     username: str
     password: str
 
 
+class UserOutput(BaseModel):
+    id: str
+    username: str
+    email: EmailStr
+    password_hash: str
+    
+    
 class UserDB(BaseModel):
     id: PyObjectId | None = Field(default_factory=PyObjectId, alias="_id")
     username: str
@@ -29,3 +32,7 @@ class UserDB(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
+
+
+class Users(BaseModel):
+    users: list[UserOutput]

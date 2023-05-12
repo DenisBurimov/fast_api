@@ -1,48 +1,40 @@
-from fastapi import APIRouter, Request  # HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from pymongo.database import Database
+from bson.objectid import ObjectId
+from app import get_db
 import app.schema as s
-
-# from app.database import get_db
 
 # from app.dependency import get_current_user
 
 user_router = APIRouter(prefix="/user", tags=["Users"])
 
 
-# @user_router.post("/", status_code=201, response_model=s.User)
-# def create_user(user: s.User, db=Depends(get_db)):
-#     # new_user = m.User(**user.dict())
-#     # db.add(new_user)
-#     # db.commit()
-#     # db.refresh(new_user)
-
-#     return  # new_user
-
-
 @user_router.get(
-    "/",
-    # response_model=s.Users,
+    "/all",
+    response_model=s.Users
 )
-def get_users(
-    request: Request,
-    # db=Depends(get_db),
+def get_users(db: Database = Depends(get_db)):
+    collection = db.users.find()
+    users = []
+    for obj in collection:
+        user = s.UserOutput(
+            id=str(obj.get("id")),
+            username=obj.get("username"),
+            email=obj.get("email"),
+            password_hash=obj.get("password_hash"),
+        )
+        users.append(dict(user))
+    return s.Users(users=users)
+
+
+@user_router.get("/{id}", response_model=s.UserOutput)
+def get_user_by_id(
+    id: str,
+    db: Database = Depends(get_db),
     # current_user: int = Depends(get_current_user),
 ):
-    collection = request.app.database["user"].find()
-    users = list(collection)
-    # cursor = db.local.user.find()
-    # users = [s.User(**x) for x in cursor]
-    return users
+    user = db.users.find_one({"id": ObjectId(id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="This user was not found")
 
-
-# @user_router.get("/{id}", response_model=s.User)
-# def get_user(
-#     id: int,
-#     db=Depends(db),
-#     # current_user: int = Depends(get_current_user),
-# ):
-#     user = db.query(m.User).get(id)
-
-#     if not user:
-#         raise HTTPException(status_code=404, detail="This user was not found")
-
-#     return user
+    return s.UserOutput(id=str(user.get("id")), username=user.get("username"), email=user.get("email"), password_hash=user.get("password_hash"),)
