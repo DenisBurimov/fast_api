@@ -36,7 +36,7 @@ jobs:
         run: |
           poetry run flake8 . --count --show-source --statistics
           poetry run flake8 . --count --exit-zero --max-complexity=10 --statistics
-      - name: Run Flask tests
+      - name: Run Pytest
         run: |
           poetry run pytest
   # build:
