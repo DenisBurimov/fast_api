@@ -2,10 +2,14 @@ from typing import Generator
 
 import pytest
 from fastapi.testclient import TestClient
+from pymongo.database import Database
+
+from app import schema as s
+from tests.fixture import TestData
 
 
 @pytest.fixture
-def client() -> Generator:
+def client() -> Generator[TestClient, None, None]:
     from app.main import app
 
     with TestClient(app) as c:
@@ -15,7 +19,7 @@ def client() -> Generator:
 # @pytest.fixture
 # def authorized_users_tokens(
 #     client: TestClient,
-#     db: Session,
+#     db: Database,
 #     test_data: TestData,
 # ) -> Generator[list[s.Token], None, None]:
 #     tokens = []

@@ -10,6 +10,7 @@
     "dotenv",
     "fastapi",
     "finalizer",
+    "mongomock",
     "noqa",
     "pydantic",
     "pymongo",

@@ -5,22 +5,19 @@ from tests.fixture import TestData
 
 
 def test_auth(client: TestClient, db: Database, test_data: TestData):
-    request_data = s.UserLogin(
-        username=test_data.test_users[0].username,
-        password=test_data.test_users[0].password,
-    )
     # login by username and password
-    response = client.post("api/auth/login", data=request_data.dict())
+    response = client.post(
+        "api/auth/login",
+        data=s.UserLogin(
+            username=test_data.test_users[0].username,
+            password=test_data.test_users[0].password,
+        ).dict(),
+    )
     assert response and response.status_code == 200, "unexpected response"
 
 
 def test_signup(client: TestClient, db: Database, test_data: TestData):
-    request_data = s.User(
-        username=test_data.test_user.username,
-        email=test_data.test_user.email,
-        password=test_data.test_user.password,
-    )
-    response = client.post("api/auth/sign-up", json=request_data.dict())
+    response = client.post("api/auth/sign-up", json=test_data.test_user.dict())
     assert response and response.status_code == 201
     assert db.users.find_one({"email": test_data.test_user.email})
 
@@ -28,42 +25,53 @@ def test_signup(client: TestClient, db: Database, test_data: TestData):
 def test_get_all_users(client: TestClient, db: Database, test_data: TestData):
     response = client.get("api/user/all")
     assert response and response.status_code == 200
+    user_list = s.UserList.parse_obj(response.json())
+    assert user_list
+    assert len(user_list.users) == len(test_data.test_users) + 1
 
 
 def test_get_user_by_id(client: TestClient, db: Database, test_data: TestData):
-    test_user = db.users.find_one()
+    test_user: s.UserDB = s.UserDB.parse_obj(db.users.find_one())
 
-    test_user_id = str(test_user.get("id"))
-    test_user_username = test_user.get("username")
-    test_user_email = test_user.get("email")
-    response = client.get(f"api/user/{test_user_id}")
+    response = client.get(f"api/user/{test_user.id}")
     assert response and response.status_code == 200
-    assert test_user_username in response.text
-    assert test_user_email in response.text
+    res_user = s.UserDB.parse_obj(response.json())
+    assert res_user == test_user
 
 
 def test_update_user(client: TestClient, db: Database, test_data: TestData):
-    test_user = db.users.find_one()
-
-    test_user_id = str(test_user.get("id"))
-    data = s.UserUpdate(
-        username="New Username",
-        email=test_user.get("email"),
-        password_hash=test_user.get("password_hash"),
-    ).dict()
-    response = client.put(f"api/user/{test_user_id}", json=data)
+    test_user: s.UserDB = s.UserDB.parse_obj(db.users.find_one())
+    email_before = test_user.email
+    username_before = test_user.username
+    response = client.put(
+        f"api/user/{test_user.id}",
+        json=s.UserUpdate(
+            username="New Username",
+            email="new_email@gmail.com",
+        ).dict(exclude_none=True),
+    )
     assert response and response.status_code == 200
-    user = s.UserDB.parse_raw(response.text)
-    assert str(user.id) == test_user_id
+    user = s.UserDB.parse_obj(response.json())
+    assert user != test_user
+
+    response = client.put(
+        f"api/user/{test_user.id}",
+        json=s.UserUpdate(
+            username=username_before,
+            email=email_before,
+        ).dict(),
+    )
+    assert response and response.status_code == 200
+    user = s.UserDB.parse_obj(response.json())
+    assert user == test_user
 
 
 def test_delete_user(client: TestClient, db: Database, test_data: TestData):
-    test_user = db.users.find_one()
-    users_number_before = len(list(db.users.find()))
+    test_user: s.UserDB = s.UserDB.parse_obj(db.users.find_one())
+    users_number_before = db.users.count_documents({})
 
-    test_user_id = str(test_user.get("id"))
-    response = client.delete(f"api/user/{test_user_id}")
+    response = client.delete(f"api/user/{test_user.id}")
     assert response and response.status_code == 200
 
-    users_number_after = len(list(db.users.find()))
+    users_number_after = db.users.count_documents({})
     assert users_number_before > users_number_after
