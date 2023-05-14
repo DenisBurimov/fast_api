@@ -7,7 +7,7 @@ import app.schema as s
 
 from app.dependency import get_current_user
 
-user_router = APIRouter(prefix="/user", tags=["User", "UserList"])
+user_router = APIRouter(prefix="/user", tags=["User"])
 
 
 @user_router.get("/all", response_model=s.UserList)
