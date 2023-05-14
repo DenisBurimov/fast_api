@@ -22,28 +22,28 @@ def test_signup(client: TestClient, db: Database, test_data: TestData):
     assert db.users.find_one({"email": test_data.test_user.email})
 
 
-def test_get_all_users(client: TestClient, db: Database, test_data: TestData):
-    response = client.get("api/user/all")
+def test_get_all_users(client_a: TestClient, db: Database, test_data: TestData):
+    response = client_a.get("api/user/all")
     assert response and response.status_code == 200
     user_list = s.UserList.parse_obj(response.json())
     assert user_list
     assert len(user_list.users) == len(test_data.test_users) + 1
 
 
-def test_get_user_by_id(client: TestClient, db: Database, test_data: TestData):
+def test_get_user_by_id(client_a: TestClient, db: Database, test_data: TestData):
     test_user: s.UserDB = s.UserDB.parse_obj(db.users.find_one())
 
-    response = client.get(f"api/user/{test_user.id}")
+    response = client_a.get(f"api/user/{test_user.id}")
     assert response and response.status_code == 200
     res_user = s.UserDB.parse_obj(response.json())
     assert res_user == test_user
 
 
-def test_update_user(client: TestClient, db: Database, test_data: TestData):
+def test_update_user(client_a: TestClient, db: Database, test_data: TestData):
     test_user: s.UserDB = s.UserDB.parse_obj(db.users.find_one())
     email_before = test_user.email
     username_before = test_user.username
-    response = client.put(
+    response = client_a.put(
         f"api/user/{test_user.id}",
         json=s.UserUpdate(
             username="New Username",
@@ -54,7 +54,7 @@ def test_update_user(client: TestClient, db: Database, test_data: TestData):
     user = s.UserDB.parse_obj(response.json())
     assert user != test_user
 
-    response = client.put(
+    response = client_a.put(
         f"api/user/{test_user.id}",
         json=s.UserUpdate(
             username=username_before,
@@ -66,11 +66,11 @@ def test_update_user(client: TestClient, db: Database, test_data: TestData):
     assert user == test_user
 
 
-def test_delete_user(client: TestClient, db: Database, test_data: TestData):
+def test_delete_user(client_a: TestClient, db: Database, test_data: TestData):
     test_user: s.UserDB = s.UserDB.parse_obj(db.users.find_one())
     users_number_before = db.users.count_documents({})
 
-    response = client.delete(f"api/user/{test_user.id}")
+    response = client_a.delete(f"api/user/{test_user.id}")
     assert response and response.status_code == 200
 
     users_number_after = db.users.count_documents({})

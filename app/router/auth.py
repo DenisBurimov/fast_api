@@ -17,7 +17,14 @@ def username(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Database = Depends(get_db),
 ):
-    res = db.users.find_one({"username": user_credentials.username})
+    res = db.users.find_one(
+        {
+            "$or": [
+                {"username": user_credentials.username},
+                {"email": user_credentials.username},
+            ]
+        }
+    )
     user = s.UserDbWithPasswd.parse_obj(res) if res else None
     if not user or not hash_verify(user_credentials.password, user.password_hash):
         log(log.ERROR, "User [%s] was not authenticated", user_credentials.username)
