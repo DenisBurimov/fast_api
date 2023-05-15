@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from .db_object import DbObject
 
 
-class RecordsType(enum.Enum):
+class RecordsType(str, enum.Enum):
     DiagnosticRecord = "diagnostics"
     SleepRecord = "sleep"
     AccelerometerRecord = "accelerometer"
@@ -19,7 +19,7 @@ class SleepData(BaseModel):
 
 
 class SleepBase(BaseModel):
-    sleep_data: SleepData
+    sleep_data: list[SleepData]
 
 
 class SleepCreate(SleepBase):

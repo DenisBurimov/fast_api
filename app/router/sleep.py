@@ -1,24 +1,39 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pymongo.database import Database
 from pymongo import results
 from bson.objectid import ObjectId
 from app import get_db
 import app.schema as s
-
 from app.dependency import get_current_user
+from app.logger import log
 
-sleep_item_router = APIRouter(prefix="/sleep", tags=["SleepItem"])
+sleep_router = APIRouter(prefix="/sleep", tags=["SleepDB"])
 
 
-@sleep_item_router.get("/all", response_model=s.SleepList)
+@sleep_router.post(
+    "/add", status_code=status.HTTP_201_CREATED, response_model=s.SleepDB
+)
+def add_sleep_item(
+    data: s.SleepCreate,
+    db: Database = Depends(get_db),
+):
+    res: results.InsertOneResult = db.sleep_items.insert_one(data.dict())
+
+    log(log.INFO, "Sleep item [%s] has been saved", res.inserted_id)
+    return s.SleepDB.parse_obj(db.sleep_items.find_one({"_id": res.inserted_id}))
+
+
+@sleep_router.get("/all", response_model=s.SleepList)
 def get_sleep_items(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    return s.SleepList(sleep_items=[s.SleepDB.parse_obj(o) for o in db.sleeps.find()])
+    return s.SleepList(
+        sleep_items=[s.SleepDB.parse_obj(o) for o in db.sleep_items.find()]
+    )
 
 
-@sleep_item_router.get("/{id}", response_model=s.SleepDB)
+@sleep_router.get("/{id}", response_model=s.SleepDB)
 def get_sleep_item_by_id(
     id: str,
     db: Database = Depends(get_db),
@@ -31,7 +46,7 @@ def get_sleep_item_by_id(
     return s.SleepDB.parse_obj(sleep_item)
 
 
-@sleep_item_router.put("/{id}", response_model=s.SleepItem)
+@sleep_router.put("/{id}", response_model=s.SleepDB)
 def get_update_sleep_item(
     id: str,
     data: s.SleepUpdate,
@@ -45,7 +60,7 @@ def get_update_sleep_item(
     return s.SleepDB.parse_obj(db.sleep_items.find_one({"_id": ObjectId(id)}))
 
 
-@sleep_item_router.delete("/{id}", response_model=s.DeleteMessage)
+@sleep_router.delete("/{id}", response_model=s.DeleteMessage)
 def get_delete_user(
     id: str,
     db: Database = Depends(get_db),
@@ -55,5 +70,5 @@ def get_delete_user(
     if not res.deleted_count:
         raise HTTPException(status_code=404, detail="This user was not found")
 
-    message = f"SleepItem {id} was successfully deleted"
+    message = f"SleepDB {id} was successfully deleted"
     return s.DeleteMessage(message=message)
