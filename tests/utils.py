@@ -15,3 +15,5 @@ def fill_db_by_test_data(db: Database, test_data: TestData):
     for u in test_data.test_users:
         u.password_hash = make_hash(u.password)
         db.users.insert_one(u.dict(exclude={"password": True}))
+    for sleep_item in test_data.test_sleep_items:
+        db.sleep_items.insert_one(sleep_item.dict())
