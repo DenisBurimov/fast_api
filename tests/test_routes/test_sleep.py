@@ -68,7 +68,7 @@ def test_create_sleep_item(client_a: TestClient, db: Database, test_data: TestDa
     assert response.status_code == 201
 
 
-def test_get_all_users(client_a: TestClient, db: Database, test_data: TestData):
+def test_get_all_sleep_items(client_a: TestClient, db: Database, test_data: TestData):
     TEST_ITEMS_NUMBER = 3
     for i in range(TEST_ITEMS_NUMBER):
         db.sleep_items.insert_one(s.SleepCreate(sleep_data=SLEEP_TEST_DATA).dict())
@@ -77,3 +77,12 @@ def test_get_all_users(client_a: TestClient, db: Database, test_data: TestData):
     sleep_items_list = s.SleepList.parse_obj(response.json())
     assert sleep_items_list
     assert len(sleep_items_list.sleep_items) == TEST_ITEMS_NUMBER
+
+
+def test_get_sleep_item_by_id(client_a: TestClient, db: Database, test_data: TestData):
+    inserted_sleep_item = db.sleep_items.insert_one(
+        s.SleepCreate(sleep_data=SLEEP_TEST_DATA).dict()
+    )
+    response = client_a.get(f"api/sleep/{str(inserted_sleep_item.inserted_id)}")
+    assert response.status_code == 200
+    assert s.SleepDB.parse_obj(response.json()).id == inserted_sleep_item.inserted_id
