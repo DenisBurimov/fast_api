@@ -1,4 +1,5 @@
 import enum
+from typing import Union
 from pydantic import BaseModel
 from bson.objectid import ObjectId
 
@@ -14,7 +15,7 @@ class RecordsType(str, enum.Enum):
 
 
 class SleepData(BaseModel):
-    data: dict
+    data: dict[str, Union[str, dict, int]]
     type: RecordsType
 
 
