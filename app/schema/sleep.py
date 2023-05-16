@@ -1,5 +1,4 @@
 import enum
-from typing import Union
 from pydantic import BaseModel
 from bson.objectid import ObjectId
 
@@ -14,27 +13,31 @@ class RecordsType(str, enum.Enum):
     PedometerRecord = "pedometer"
 
 
-class DiagnosticRecord(BaseModel):
+class DataBase(BaseModel):
+    pass
+
+
+class DiagnosticRecord(DataBase):
     date: str
     message: str
     data: dict
 
 
-class SleepRecord(BaseModel):
+class SleepRecord(DataBase):
     value: int
     startDate: str
     endDate: str
     source: str
 
 
-class AccelerometerRecord(BaseModel):
+class AccelerometerRecord(DataBase):
     date: str
     x: float
     y: float
     z: float
 
 
-class StepRecord(BaseModel):
+class StepRecord(DataBase):
     date: str
     unknown: int
     stationary: int
@@ -44,7 +47,7 @@ class StepRecord(BaseModel):
     cycling: int
 
 
-class PedometerRecord(BaseModel):
+class PedometerRecord(DataBase):
     startDate: str
     endDate: str
     numberOfSteps: int
@@ -56,13 +59,13 @@ class PedometerRecord(BaseModel):
     averageActivePace: float
 
 
-class SleepData(BaseModel):
-    data: dict[str, Union[str, dict, int]]
+class DataItem(BaseModel):
+    data: DiagnosticRecord | SleepRecord | AccelerometerRecord | StepRecord | PedometerRecord
     type: RecordsType
 
 
 class SleepBase(BaseModel):
-    sleep_data: list[SleepData]
+    dataItems: list[DataItem]
 
 
 class SleepDB(DbObject, SleepBase):
