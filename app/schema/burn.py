@@ -1,4 +1,4 @@
-import enum
+from typing import Union
 from pydantic import BaseModel
 from bson.objectid import ObjectId
 
@@ -6,7 +6,7 @@ from .db_object import DbObject
 
 
 class BurnBase(BaseModel):
-    burn_data: list[BurnData]
+    burn_data: dict[str, Union[str, list, dict]]
 
 
 class BurnDB(DbObject, BurnBase):

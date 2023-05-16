@@ -4,12 +4,14 @@ from fastapi import APIRouter, Request
 from .auth import auth_router
 from .user import user_router
 from .sleep import sleep_router
+from .burn import burn_router
 
 router = APIRouter(prefix="/api", tags=["API"])
 
 router.include_router(auth_router)
 router.include_router(user_router)
 router.include_router(sleep_router)
+router.include_router(burn_router)
 
 
 @router.get("/list-endpoints/")

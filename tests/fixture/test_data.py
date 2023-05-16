@@ -16,6 +16,7 @@ class TestData(BaseModel):
     test_superuser: s.UserCreate | None
 
     test_sleep_items: list[s.SleepBase]
+    test_burn_items: list[s.BurnBase]
 
 
 @pytest.fixture

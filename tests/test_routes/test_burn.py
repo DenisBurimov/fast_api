@@ -66,11 +66,14 @@ TEST_BURN_ITEM = {
 
 
 def test_create_burn_item(client_a: TestClient, db: Database, test_data: TestData):
+    burn_items_number_before = db.burn_items.count_documents({})
     response = client_a.post(
         "api/burn/add",
-        json=test_data.test_burn_items[0].dict(),
+        json=s.BurnBase(burn_data=TEST_BURN_ITEM).dict(),
     )
+    burn_items_number_after = db.burn_items.count_documents({})
     assert response.status_code == 201
+    assert burn_items_number_after == burn_items_number_before + 1
 
 
 def test_get_all_burn_items(client_a: TestClient, db: Database, test_data: TestData):
