@@ -14,7 +14,7 @@ sleep_router = APIRouter(prefix="/sleep", tags=["SleepDB"])
     "/add", status_code=status.HTTP_201_CREATED, response_model=s.SleepDB
 )
 def add_sleep_item(
-    data: s.SleepCreate,
+    data: s.SleepBase,
     db: Database = Depends(get_db),
 ):
     res: results.InsertOneResult = db.sleep_items.insert_one(data.dict())
@@ -44,20 +44,6 @@ def get_sleep_item_by_id(
         raise HTTPException(status_code=404, detail="This sleep item was not found")
 
     return s.SleepDB.parse_obj(sleep_item)
-
-
-@sleep_router.put("/{id}", response_model=s.SleepDB)
-def get_update_sleep_item(
-    id: str,
-    data: s.SleepUpdate,
-    db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
-):
-    db.sleep_items.update_one(
-        {"_id": ObjectId(id)}, {"$set": data.dict(exclude_none=True)}
-    )
-
-    return s.SleepDB.parse_obj(db.sleep_items.find_one({"_id": ObjectId(id)}))
 
 
 @sleep_router.delete("/{id}", response_model=s.DeleteMessage)

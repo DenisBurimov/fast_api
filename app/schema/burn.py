@@ -5,32 +5,19 @@ from bson.objectid import ObjectId
 from .db_object import DbObject
 
 
-class RecordsType(str, enum.Enum):
-    DiagnosticRecord = "diagnostics"
-    SleepRecord = "sleep"
-    AccelerometerRecord = "accelerometer"
-    StepRecord = "step"
-    PedometerRecord = "pedometer"
+class BurnBase(BaseModel):
+    burn_data: list[BurnData]
 
 
-class SleepData(BaseModel):
-    data: dict
-    type: RecordsType
-
-
-class SleepBase(BaseModel):
-    sleep_data: list[SleepData]
-
-
-class SleepDB(DbObject, SleepBase):
+class BurnDB(DbObject, BurnBase):
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: lambda v: str(v)}
 
 
-class SleepList(BaseModel):
-    sleep_items: list[SleepDB]
+class BurnList(BaseModel):
+    burn_items: list[BurnDB]
 
     class Config:
         allow_population_by_field_name = True

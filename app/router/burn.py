@@ -1,26 +1,35 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pymongo.database import Database
 from pymongo import results
 from bson.objectid import ObjectId
 from app import get_db
 import app.schema as s
-
 from app.dependency import get_current_user
+from app.logger import log
 
-burn_item_router = APIRouter(prefix="/burn", tags=["BurnItem"])
+burn_router = APIRouter(prefix="/burn", tags=["BurnDB"])
 
 
-@burn_item_router.get("/all", response_model=s.BurnItemsList)
+@burn_router.post("/add", status_code=status.HTTP_201_CREATED, response_model=s.BurnDB)
+def add_burn_item(
+    data: s.BurnBase,
+    db: Database = Depends(get_db),
+):
+    res: results.InsertOneResult = db.burn_items.insert_one(data.dict())
+
+    log(log.INFO, "Burn item [%s] has been saved", res.inserted_id)
+    return s.BurnDB.parse_obj(db.burn_items.find_one({"_id": res.inserted_id}))
+
+
+@burn_router.get("/all", response_model=s.BurnList)
 def get_burn_items(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    return s.BurnItemsList(
-        burn_items=[s.BurnItem.parse_obj(o) for o in db.burns.find()]
-    )
+    return s.BurnList(burn_items=[s.BurnDB.parse_obj(o) for o in db.burn_items.find()])
 
 
-@burn_item_router.get("/{id}", response_model=s.BurnItem)
+@burn_router.get("/{id}", response_model=s.BurnDB)
 def get_burn_item_by_id(
     id: str,
     db: Database = Depends(get_db),
@@ -30,24 +39,10 @@ def get_burn_item_by_id(
     if not burn_item:
         raise HTTPException(status_code=404, detail="This burn item was not found")
 
-    return s.BurnItem.parse_obj(burn_item)
+    return s.BurnDB.parse_obj(burn_item)
 
 
-@burn_item_router.put("/{id}", response_model=s.BurnItem)
-def get_update_burn_item(
-    id: str,
-    data: s.BurnItemUpdate,
-    db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
-):
-    db.burn_items.update_one(
-        {"_id": ObjectId(id)}, {"$set": data.dict(exclude_none=True)}
-    )
-
-    return s.BurnItem.parse_obj(db.burn_items.find_one({"_id": ObjectId(id)}))
-
-
-@burn_item_router.delete("/{id}", response_model=s.DeleteMessage)
+@burn_router.delete("/{id}", response_model=s.DeleteMessage)
 def get_delete_user(
     id: str,
     db: Database = Depends(get_db),
@@ -57,5 +52,5 @@ def get_delete_user(
     if not res.deleted_count:
         raise HTTPException(status_code=404, detail="This user was not found")
 
-    message = f"BurnItem {id} was successfully deleted"
+    message = f"BurnDB {id} was successfully deleted"
     return s.DeleteMessage(message=message)
