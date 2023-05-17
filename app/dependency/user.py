@@ -8,7 +8,7 @@ from app.oauth2 import verify_access_token, INVALID_CREDENTIALS_EXCEPTION
 from app.database import get_db
 import app.schema as s
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 def get_current_user(
