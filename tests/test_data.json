@@ -345,5 +345,49 @@
         }
       }
     }
+  ],
+  "test_journal_items": [
+    {
+      "answers": [
+        {
+          "id": 0,
+          "answered": true,
+          "level": 25
+        },
+        {
+          "id": 1,
+          "answered": false,
+          "level": 0
+        }
+      ]
+    },
+    {
+      "answers": [
+        {
+          "id": 0,
+          "answered": true,
+          "level": 24
+        },
+        {
+          "id": 2,
+          "answered": false,
+          "level": 2
+        }
+      ]
+    },
+    {
+      "answers": [
+        {
+          "id": 3,
+          "answered": true,
+          "level": 23
+        },
+        {
+          "id": 1,
+          "answered": false,
+          "level": 3
+        }
+      ]
+    }
   ]
 }
