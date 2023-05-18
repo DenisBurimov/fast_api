@@ -67,6 +67,66 @@ class DataItem(BaseModel):
 class SleepBase(BaseModel):
     dataItems: list[DataItem]
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "dataItems": [
+                    {
+                        "data": {
+                            "date": "2023-01-31 03:00:00+00:00",
+                            "message": "Diagnostics message",
+                            "data": {},
+                        },
+                        "type": "diagnostics",
+                    },
+                    {
+                        "data": {
+                            "value": 0,
+                            "startDate": "2023-01-31 03:00:00+00:00",
+                            "endDate": "2023-01-31 13:00:00+00:00",
+                            "source": "Apple Watch",
+                        },
+                        "type": "sleep",
+                    },
+                    {
+                        "data": {
+                            "date": "2023-01-31 03:00:00+00:00",
+                            "x": -0.019287109375,
+                            "y": -0.0205078125,
+                            "z": -0.996826171875,
+                        },
+                        "type": "accelerometer",
+                    },
+                    {
+                        "data": {
+                            "date": "2023-01-31 03:00:00+00:00",
+                            "unknown": 0,
+                            "stationary": 0,
+                            "walking": 1,
+                            "running": 0,
+                            "automotive": 0,
+                            "cycling": 0,
+                        },
+                        "type": "step",
+                    },
+                    {
+                        "data": {
+                            "startDate": "2023-01-31 03:00:00+00:00",
+                            "endDate": "2023-01-31 04:00:00+00:00",
+                            "numberOfSteps": 6500,
+                            "distance": 10.5,
+                            "floorsAscended": 20,
+                            "floorsDescended": 20,
+                            "currentPace": 0.5,
+                            "currentCadence": 1.5,
+                            "averageActivePace": 0.8,
+                        },
+                        "type": "pedometer",
+                    },
+                ]
+            }
+        }
+
 
 class SleepDB(DbObject, SleepBase):
     class Config:
