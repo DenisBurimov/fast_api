@@ -7,7 +7,9 @@ from .config import get_settings
 
 settings = get_settings()
 
-mongo = MongoClient(settings.MONGO_URI)
+# mongo = MongoClient(settings.MONGO_URI)
+# mongo = MongoClient(host=[f"{mhost}:{mport}"], username=f"{musername}", password=f"{mpassword}")
+mongo = MongoClient(host=["mongo"], username="user", password="pass")
 
 
 def get_db() -> Generator[Database, None, None]:
