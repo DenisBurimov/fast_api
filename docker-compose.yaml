@@ -22,6 +22,8 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME:-user}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-pass}
       ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo:27017/
+    depends_on:
+      - mongo
 
   app:
     build: .
@@ -31,7 +33,6 @@ services:
       DB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo/oculo
     ports:
       - 127.0.0.1:${APP_LOCAL_PORT:-8070}:80
-
 
 volumes:
   db_data:
