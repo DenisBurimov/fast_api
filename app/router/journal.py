@@ -16,6 +16,7 @@ journal_router = APIRouter(prefix="/journal", tags=["JournalDB"])
 def add_journal_item(
     data: s.JournalBase,
     db: Database = Depends(get_db),
+    _: s.UserDB = Depends(get_current_user),
 ):
     res: results.InsertOneResult = db.journal_items.insert_one(data.dict())
 

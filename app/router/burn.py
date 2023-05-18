@@ -14,6 +14,7 @@ burn_router = APIRouter(prefix="/burn", tags=["BurnDB"])
 def add_burn_item(
     data: s.BurnBase,
     db: Database = Depends(get_db),
+    _: s.UserDB = Depends(get_current_user),
 ):
     res: results.InsertOneResult = db.burn_items.insert_one(data.dict())
 

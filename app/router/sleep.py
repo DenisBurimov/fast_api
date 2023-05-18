@@ -16,6 +16,7 @@ sleep_router = APIRouter(prefix="/sleep", tags=["SleepDB"])
 def add_sleep_item(
     data: s.SleepBase,
     db: Database = Depends(get_db),
+    _: s.UserDB = Depends(get_current_user),
 ):
     res: results.InsertOneResult = db.sleep_items.insert_one(data.dict())
 
