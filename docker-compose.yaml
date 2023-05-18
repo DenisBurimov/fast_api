@@ -30,7 +30,7 @@ services:
     restart: always
     command: bash ./start_server.sh
     environment:
-      DB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo/oculo
+      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo/oculo
     ports:
       - 127.0.0.1:${APP_LOCAL_PORT:-8070}:80
 
