@@ -6,7 +6,14 @@ from .db_object import DbObject
 
 
 class BurnBase(BaseModel):
-    burn_data: dict[str, Union[str, list, dict]]
+    # burn_data: dict[str, Union[str, list, dict]]
+    sessionInfo: str
+    timeStamps: dict[str, Union[str, int, float]]
+    deviceInfo: dict[str, Union[str, int, float]]
+    leftPupilInfo: list[dict]
+    rightPupilInfo: list[dict]
+    leftBlinkInfo: dict[str, Union[list, int]]
+    rightBlinkInfo: dict[str, Union[list, int]]
 
     class Config:
         schema_extra = {
