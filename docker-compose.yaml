@@ -13,24 +13,28 @@ services:
     ports:
       - 127.0.0.1:27017:27017
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 127.0.0.1:8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME:-user}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-pass}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo:17017/
-    depends_on:
-      - mongo
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 127.0.0.1:8081:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME:-user}
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-pass}
+  #     ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo:17017/
+  #   depends_on:
+  #     - mongo
 
   app:
     build: .
     restart: always
     command: bash ./start_server.sh
     environment:
-      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo/oculo
+      # MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-user}:${MONGO_INITDB_ROOT_PASSWORD:-pass}@mongo/oculo
+      MONGO_LOCAL_HOST: ${MONGO_LOCAL_HOST}
+      MONGO_LOCAL_PORT: ${MONGO_LOCAL_PORT}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - 127.0.0.1:${APP_LOCAL_PORT:-8070}:80
 
