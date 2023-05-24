@@ -21,14 +21,32 @@ class UsersGender(str, enum.Enum):
     other = "other"
 
 
+# {"_id":{"$oid":"640a17f89d770e182aced59a"},
+# "email":"bla0@a.pl",
+# "password":"$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+# "firstName":"Krzysztof",
+# "lastName":"Sobol",
+# "age":{"$numberInt":"29"},
+# "expectations":[{"$numberInt":"0"},{"$numberInt":"1"}],
+# "gender":{"$numberInt":"0"},
+# "actvities": "['x', 'y', 'z']"
+# "createdAt":{"$date":{"$numberLong":"1678383096251"}},
+# "updatedAt":{"$date":{"$numberLong":"1678383096251"}},
+# "__v":{"$numberInt":"0"}}
+
+
 class UserBase(BaseModel):
-    username: str
-    email: EmailStr
-    firstname: str
-    lastname: str
-    age: int
-    expectations: UsersExpectations
-    gender: UsersGender
+    username: str  # V
+    email: EmailStr  # V
+    firstname: str  # To remove
+    lastname: str  # To remove
+    age: int  # V
+    expectations: UsersExpectations  # V
+    gender: UsersGender  # V
+
+    # To add:
+    # created_at
+    # upated_at
 
 
 class UserCreate(UserBase):
