@@ -39,8 +39,8 @@ def test_get_all_burn_items(client_a: TestClient, db: Database):
     assert len(burn_items_list.burn_items) == len(list(db.burn_items.find()))
 
 
-# def test_get_burn_item_by_id(client_a: TestClient, db: Database, test_data: TestData):
-#     item_to_get_id = db.burn_items.find_one().get("_id")
-#     response = client_a.get(f"api/burn/{str(item_to_get_id)}")
-#     assert response.status_code == 200
-#     assert s.BurnDB.parse_obj(response.json()).id == item_to_get_id
+def test_get_burn_item_by_id(client_a: TestClient, db: Database):
+    item_to_get_id = db.burn_items.find_one().get("_id")
+    response = client_a.get(f"api/burn/{str(item_to_get_id)}")
+    assert response.status_code == 200
+    assert s.BurnDB.parse_obj(response.json()).id == item_to_get_id
