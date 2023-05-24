@@ -12,19 +12,17 @@ burn_router = APIRouter(prefix="/burn", tags=["BurnDB"])
 
 @burn_router.post("/add", status_code=status.HTTP_201_CREATED, response_model=s.BurnDB)
 def add_burn_item(
-    # data: s.BurnBase,
     data: dict,
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    new_burn_item = {
-        "burn_values": data["burn_values"],
-        "created_at": {
-            "date": {"numberLong": data["createdAt"]["$date"]["$numberLong"]}
-        },
-    }
-    # res: results.InsertOneResult = db.burn_items.insert_one(data.dict())
-    res: results.InsertOneResult = db.burn_items.insert_one(new_burn_item)
+    burn_values = data["burn_values"]
+    created_at = {"date": {"numberLong": data["createdAt"]["$date"]["$numberLong"]}}
+    new_burn_item = s.BurnBase(
+        burn_values=burn_values,
+        created_at=created_at,
+    )
+    res: results.InsertOneResult = db.burn_items.insert_one(new_burn_item.dict())
 
     log(log.INFO, "Burn item [%s] has been saved", res.inserted_id)
     return s.BurnDB.parse_obj(db.burn_items.find_one({"_id": res.inserted_id}))
