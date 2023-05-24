@@ -21,6 +21,9 @@ def create_superuser(_):
             password_hash=make_hash(cfg.ADMIN_PASS),
             firstname=cfg.ADMIN_USER,
             lastname=cfg.ADMIN_USER,
+            age=30,
+            expectations="sleep",
+            gender="male",
         )
-        db["user"].insert_one(user.dict())
+        db["users"].insert_one(user.dict())
         log(log.INFO, "SuperUser %s created", cfg.ADMIN_EMAIL)

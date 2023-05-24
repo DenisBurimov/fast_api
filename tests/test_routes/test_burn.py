@@ -10,6 +10,11 @@ TEST_RAW_BURN_ITEM = {
     "createdAt": {"$date": {"$numberLong": "1678383096251"}},
 }
 
+TEST_RAW_BURN_ITEM = {
+    "burn_values": "[-1.1, 2.2, -3.3, 4.4]",
+    "createdAt": {"$date": {"$numberLong": "1678383096251"}},
+}
+
 TEST_CLEAN_BURN_ITEM = {
     "burn_values": "[x, y, z, w]",
     "createdAt": {"date": {"numberLong": "1678383096251"}},
@@ -18,7 +23,8 @@ TEST_CLEAN_BURN_ITEM = {
 
 def test_create_burn_item(client_a: TestClient, db: Database):
     burn_items_number_before = db.burn_items.count_documents({})
-    response = client_a.post("api/burn/add", json=TEST_RAW_BURN_ITEM)
+    data = s.BurnBase.parse_obj(TEST_RAW_BURN_ITEM)
+    response = client_a.post("api/burn/add", data=data.json(by_alias=True))
     burn_items_number_after = db.burn_items.count_documents({})
     assert response.status_code == 201
     assert burn_items_number_after == burn_items_number_before + 1
