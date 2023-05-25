@@ -29,9 +29,9 @@ class BurnBase(BaseModel):
         if "$date" not in value:
             raise ValueError("Unexpected date format!")
 
-        ts = int(value["$date"]["$numberLong"])
+        py_timestamp = int(value["$date"]["$numberLong"])
 
-        return datetime.fromtimestamp(ts / 1000)
+        return datetime.fromtimestamp(py_timestamp / 1000)
 
     @validator("v", pre=True)
     def v_from_dict(cls, value: dict):

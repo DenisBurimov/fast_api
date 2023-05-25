@@ -7,7 +7,7 @@ from tests.fixture import TestData
 def test_create_journal_item(client_a: TestClient, db: Database, test_data: TestData):
     response = client_a.post(
         "api/journal/add",
-        json=test_data.test_journal_items[0].dict(),
+        data=test_data.test_journal_items[0].json(by_alias=True),
     )
     assert response.status_code == 201
 

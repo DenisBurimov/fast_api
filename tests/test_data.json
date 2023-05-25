@@ -478,46 +478,115 @@
   ],
   "test_journal_items": [
     {
-      "answers": [
+      "_id": {
+        "$oid": "640a17f89d770e182aced53a"
+      },
+      "sleep_duration": {
+        "$numberInt": "389"
+      },
+      "activities": [
         {
-          "id": 0,
-          "answered": true,
-          "level": 25
+          "activity": "meditation",
+          "duration": 20,
+          "timing": 3
         },
         {
-          "id": 1,
-          "answered": false,
-          "level": 0
+          "activity": "ice_bath",
+          "duration": 20,
+          "timing": 2
+        },
+        {
+          "activity": "supplements",
+          "amount": 200,
+          "timing": 1
+        },
+        {
+          "activity": "relax",
+          "timing": 4
         }
-      ]
+      ],
+      "createdAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "__v": {
+        "$numberInt": "0"
+      }
     },
     {
-      "answers": [
+      "_id": {
+        "$oid": "640a17f89d770e182aced51b"
+      },
+      "sleep_duration": {
+        "$numberInt": "489"
+      },
+      "activities": [
         {
-          "id": 0,
-          "answered": true,
-          "level": 24
+          "activity": "meditation",
+          "duration": 20,
+          "timing": 3
         },
         {
-          "id": 2,
-          "answered": false,
-          "level": 2
+          "activity": "ice_bath",
+          "duration": 20,
+          "timing": 2
+        },
+        {
+          "activity": "supplements",
+          "amount": 200,
+          "timing": 1
+        },
+        {
+          "activity": "relax",
+          "timing": 4
         }
-      ]
+      ],
+      "createdAt": {
+        "$date": {
+          "$numberLong": "1678384096251"
+        }
+      },
+      "__v": {
+        "$numberInt": "0"
+      }
     },
     {
-      "answers": [
+      "_id": {
+        "$oid": "640a17f89d770e182aced52c"
+      },
+      "sleep_duration": {
+        "$numberInt": "589"
+      },
+      "activities": [
         {
-          "id": 3,
-          "answered": true,
-          "level": 23
+          "activity": "meditation",
+          "duration": 20,
+          "timing": 3
         },
         {
-          "id": 1,
-          "answered": false,
-          "level": 3
+          "activity": "ice_bath",
+          "duration": 20,
+          "timing": 2
+        },
+        {
+          "activity": "supplements",
+          "amount": 200,
+          "timing": 1
+        },
+        {
+          "activity": "relax",
+          "timing": 4
         }
-      ]
+      ],
+      "createdAt": {
+        "$date": {
+          "$numberLong": "1678385096251"
+        }
+      },
+      "__v": {
+        "$numberInt": "0"
+      }
     }
   ]
 }

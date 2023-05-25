@@ -7,12 +7,12 @@ from .db_object import DbObject
 
 class UserBase(BaseModel):
     id: str | None = Field(alias="_id")
-    email: EmailStr  # V
+    email: EmailStr
     firstname: str = Field(alias="firstName")  # To remove?
     lastname: str = Field(alias="lastName")  # To remove?
-    age: int  # V
-    expectations: list  # V
-    gender: int  # V
+    age: int
+    expectations: list
+    gender: int
     created_at: datetime | None
     updated_at: datetime | None
 
