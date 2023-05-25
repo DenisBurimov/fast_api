@@ -19,5 +19,5 @@ def fill_db_by_test_data(db: Database, test_data: TestData):
         db.journal_items.insert_one(journal_item.dict())
     for burn_item in test_data.test_burn_items:
         db.burn_items.insert_one(burn_item.dict())
-    # for sleep_item in test_data.test_sleep_items:
-    #     db.sleep_items.insert_one(sleep_item.dict())
+    for sleep_item in test_data.test_sleep_items:
+        db.sleep_items.insert_one(sleep_item.dict())

@@ -4,20 +4,6 @@ from bson.objectid import ObjectId
 from .db_object import DbObject
 
 
-j = {
-    "_id": {"$oid": "640a17f89d770e182aced59a"},
-    "sleep_duration": {"$numberInt": "389"},
-    "activities": [
-        {"activity": "meditation", "duration": 20, "timing": 3},
-        {"activity": "ice_bath", "duration": 20, "timing": 2},
-        {"activity": "supplements", "amount": 200, "timing": 1},
-        {"activity": "relax", "timing": 4},
-    ],
-    "createdAt": {"$date": {"$numberLong": "1678383096251"}},
-    "__v": {"$numberInt": "0"},
-}
-
-
 class JournalBase(BaseModel):
     id: str | None = Field(alias="_id")
     sleep_duration: int

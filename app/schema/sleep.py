@@ -1,130 +1,64 @@
-import enum
-from pydantic import BaseModel
+from datetime import datetime
+from pydantic import BaseModel, Field, validator
 from bson.objectid import ObjectId
-
 from .db_object import DbObject
 
 
-class RecordsType(str, enum.Enum):
-    DiagnosticRecord = "diagnostics"
-    SleepRecord = "sleep"
-    AccelerometerRecord = "accelerometer"
-    StepRecord = "step"
-    PedometerRecord = "pedometer"
-
-
-class DataBase(BaseModel):
-    pass
-
-
-class DiagnosticRecord(DataBase):
-    date: str
-    message: str
-    data: dict
-
-
-class SleepRecord(DataBase):
-    value: int
-    startDate: str
-    endDate: str
-    source: str
-
-
-class AccelerometerRecord(DataBase):
-    date: str
-    x: float
-    y: float
-    z: float
-
-
-class StepRecord(DataBase):
-    date: str
-    unknown: int
-    stationary: int
-    walking: int
-    running: int
-    automotive: int
-    cycling: int
-
-
-class PedometerRecord(DataBase):
-    startDate: str
-    endDate: str
-    numberOfSteps: int
-    distance: float
-    floorsAscended: int
-    floorsDescended: int
-    currentPace: float
-    currentCadence: float
-    averageActivePace: float
-
-
-class DataItem(BaseModel):
-    data: DiagnosticRecord | SleepRecord | AccelerometerRecord | StepRecord | PedometerRecord
-    type: RecordsType
+SLEEP_ITEM = {
+    "_id": {"$oid": "640a17f89d770e182aced59a"},
+    "sleep_duration": {"$numberInt": "389"},
+    "sleep_intervals": [
+        {"start": "22:37:00", "end": "8:45:00", "level": 0},
+        {"start": "8:45:00", "end": "10:15:00", "level": 1},
+        {"start": "10:15:00", "end": "11:50:00", "level": 2},
+        {"start": "11:50:00", "end": "12:20:00", "level": 1},
+        {"start": "12:20:00", "end": "13:15:00", "level": 2},
+        {"start": "13:15:00", "end": "13:45:00", "level": 1},
+        {"start": "13:45:00", "end": "15:20:00", "level": 2},
+        {"start": "15:20:00", "end": "15:50:00", "level": 1},
+        {"start": "15:50:00", "end": "17:25:00", "level": 2},
+        {"start": "17:25:00", "end": "17:55:00", "level": 1},
+        {"start": "17:55:00", "end": "19:30:00", "level": 2},
+        {"start": "19:30:00", "end": "20:00:00", "level": 1},
+        {"start": "20:00:00", "end": "24:00:00", "level": 0},
+    ],
+    "createdAt": {"$date": {"$numberLong": "1678383096251"}},
+    "__v": {"$numberInt": "0"},
+}
 
 
 class SleepBase(BaseModel):
-    dataItems: list[DataItem]
+    id: str | None = Field(alias="_id")
+    sleep_duration: int
+    sleep_intervals: list[dict]
+    created_at: datetime = Field(alias="createdAt")
+
+    @validator("id", pre=True)
+    def id_from_dict(cls, value: dict):
+        if not isinstance(value, dict):
+            return value
+        return value.get("$oid")
+
+    @validator("sleep_duration", pre=True)
+    def sleep_duration_from_dict(cls, value: dict):
+        if not isinstance(value, dict):
+            return value
+        return value.get("$numberInt")
+
+    @validator("created_at", pre=True)
+    def created_at_from_dict(cls, value: dict) -> datetime:
+        if not isinstance(value, dict):
+            return value
+        if "$date" not in value:
+            raise ValueError("Unexpected date format!")
+        py_timestamp = int(value["$date"]["$numberLong"])
+        return datetime.fromtimestamp(py_timestamp / 1000)
 
     class Config:
-        schema_extra = {
-            "example": {
-                "dataItems": [
-                    {
-                        "data": {
-                            "date": "2023-01-31 03:00:00+00:00",
-                            "message": "Diagnostics message",
-                            "data": {},
-                        },
-                        "type": "diagnostics",
-                    },
-                    {
-                        "data": {
-                            "value": 0,
-                            "startDate": "2023-01-31 03:00:00+00:00",
-                            "endDate": "2023-01-31 13:00:00+00:00",
-                            "source": "Apple Watch",
-                        },
-                        "type": "sleep",
-                    },
-                    {
-                        "data": {
-                            "date": "2023-01-31 03:00:00+00:00",
-                            "x": -0.019287109375,
-                            "y": -0.0205078125,
-                            "z": -0.996826171875,
-                        },
-                        "type": "accelerometer",
-                    },
-                    {
-                        "data": {
-                            "date": "2023-01-31 03:00:00+00:00",
-                            "unknown": 0,
-                            "stationary": 0,
-                            "walking": 1,
-                            "running": 0,
-                            "automotive": 0,
-                            "cycling": 0,
-                        },
-                        "type": "step",
-                    },
-                    {
-                        "data": {
-                            "startDate": "2023-01-31 03:00:00+00:00",
-                            "endDate": "2023-01-31 04:00:00+00:00",
-                            "numberOfSteps": 6500,
-                            "distance": 10.5,
-                            "floorsAscended": 20,
-                            "floorsDescended": 20,
-                            "currentPace": 0.5,
-                            "currentCadence": 1.5,
-                            "averageActivePace": 0.8,
-                        },
-                        "type": "pedometer",
-                    },
-                ]
-            }
+        allow_population_by_field_name = True
+        schema_extra = {}
+        json_encoders = {
+            datetime: lambda v: {"$date": {"$numberLong": int(v.timestamp() * 1000)}},
         }
 
 

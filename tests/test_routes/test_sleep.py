@@ -4,10 +4,33 @@ import app.schema as s
 from tests.fixture import TestData
 
 
+TEST_SLEEP_ITEM = {
+    "_id": {"$oid": "640a17f89d770e182aced59a"},
+    "sleep_duration": {"numberInt": "389"},
+    "sleep_intervals": [
+        {"start": "22:37:00", "end": "8:45:00", "level": 0},
+        {"start": "8:45:00", "end": "10:15:00", "level": 1},
+        {"start": "10:15:00", "end": "11:50:00", "level": 2},
+        {"start": "11:50:00", "end": "12:20:00", "level": 1},
+        {"start": "12:20:00", "end": "13:15:00", "level": 2},
+        {"start": "13:15:00", "end": "13:45:00", "level": 1},
+        {"start": "13:45:00", "end": "15:20:00", "level": 2},
+        {"start": "15:20:00", "end": "15:50:00", "level": 1},
+        {"start": "15:50:00", "end": "17:25:00", "level": 2},
+        {"start": "17:25:00", "end": "17:55:00", "level": 1},
+        {"start": "17:55:00", "end": "19:30:00", "level": 2},
+        {"start": "19:30:00", "end": "20:00:00", "level": 1},
+        {"start": "20:00:00", "end": "24:00:00", "level": 0},
+    ],
+    "createdAt": {"$date": {"$numberLong": "1678383096251"}},
+    "__v": {"$numberInt": "0"},
+}
+
+
 def test_create_sleep_item(client_a: TestClient, db: Database, test_data: TestData):
     response = client_a.post(
         "api/sleep/add",
-        json=test_data.test_sleep_items[0].dict(),
+        data=test_data.test_sleep_items[0].json(by_alias=True),
     )
     assert response.status_code == 201
 
