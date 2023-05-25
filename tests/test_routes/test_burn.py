@@ -1,48 +1,24 @@
 from fastapi.testclient import TestClient
 from pymongo.database import Database
 import app.schema as s
-
-# from tests.fixture import TestData
-
-
-TEST_RAW_BURN_ITEM = {
-    "burn_values": "[x, y, z, w]",
-    "createdAt": {"$date": {"$numberLong": "1678383096251"}},
-}
-
-TEST_RAW_BURN_ITEM = {
-    "burn_values": "[-1.1, 2.2, -3.3, 4.4]",
-    "createdAt": {"$date": {"$numberLong": "1678383096251"}},
-}
-
-TEST_CLEAN_BURN_ITEM = {
-    "burn_values": "[x, y, z, w]",
-    "createdAt": {"date": {"numberLong": "1678383096251"}},
-}
+from tests.fixture import TestData
 
 
-def test_create_burn_item(client_a: TestClient, db: Database):
+def test_create_burn_item(client_a: TestClient, db: Database, test_data: TestData):
     burn_items_number_before = db.burn_items.count_documents({})
-    data = s.BurnBase.parse_obj(TEST_RAW_BURN_ITEM)
+    data = s.BurnBase.parse_obj(test_data.test_burn_items[0].dict())
     response = client_a.post("api/burn/add", data=data.json(by_alias=True))
     burn_items_number_after = db.burn_items.count_documents({})
     assert response.status_code == 201
     assert burn_items_number_after == burn_items_number_before + 1
 
 
-def test_get_all_burn_items(client_a: TestClient, db: Database):
-    TEST_BURN_ITEMS_NUMBER = 5
-    for _ in range(TEST_BURN_ITEMS_NUMBER):
-        new_burn_item = s.BurnBase(
-            burn_values=TEST_CLEAN_BURN_ITEM["burn_values"],
-            created_at=TEST_CLEAN_BURN_ITEM["createdAt"],
-        )
-        db.burn_items.insert_one(new_burn_item.dict())
+def test_get_all_burn_items(client_a: TestClient, db: Database, test_data: TestData):
     response = client_a.get("api/burn/all")
     assert response.status_code == 200
     burn_items_list = s.BurnList.parse_obj(response.json())
     assert burn_items_list
-    assert len(burn_items_list.burn_items) == len(list(db.burn_items.find()))
+    assert len(burn_items_list.burn_items) == len(test_data.test_burn_items)
 
 
 def test_get_burn_item_by_id(client_a: TestClient, db: Database):

@@ -4,6 +4,22 @@ import app.schema as s
 from tests.fixture import TestData
 
 
+TEST_USER = {
+    "_id": {"$oid": "640a17f89d770e182aced59a"},
+    "email": "bla0@a.pl",
+    "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+    "firstName": "Krzysztof",
+    "lastName": "Sobol",
+    "age": {"$numberInt": "29"},
+    "expectations": [{"$numberInt": "0"}, {"$numberInt": "1"}],
+    "gender": {"$numberInt": "0"},
+    "actvities": "['x', 'y', 'z']",
+    "createdAt": {"$date": {"$numberLong": "1678383096251"}},
+    "updatedAt": {"$date": {"$numberLong": "1678383096251"}},
+    "__v": {"$numberInt": "0"},
+}
+
+
 def test_auth(client: TestClient, db: Database, test_data: TestData):
     # login by username and password
     response = client.post(

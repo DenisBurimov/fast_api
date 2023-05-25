@@ -1,27 +1,23 @@
 from typing import Any
 from datetime import datetime
-import itertools
-
 from pydantic import BaseModel, Field, validator
-from pydantic.fields import ModelField
 from pydantic.utils import GetterDict
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
 
 
-class BurnGetter(GetterDict):
-    def get(self, key: str, default: Any) -> Any:
-        # element attributes
-        if key == "created_at":
-            if self._obj.createdAt:
-                return ""
-        return getattr(self._obj, key) or default
-
-
 class BurnBase(BaseModel):
+    id: str | None = Field(alias="_id")
     burn_values: list[float]
     created_at: datetime = Field(alias="createdAt")
+    v: int = Field(alias="__v")
+
+    @validator("id", pre=True)
+    def id_from_dict(cls, value: dict):
+        if not isinstance(value, dict):
+            return value
+        return value.get("$oid")
 
     @validator("burn_values", pre=True)
     def burn_values_from_str(cls, value: str) -> list[float]:
@@ -40,13 +36,18 @@ class BurnBase(BaseModel):
 
         return datetime.fromtimestamp(ts / 1000)
 
+    @validator("v", pre=True)
+    def v_from_dict(cls, value: dict):
+        if not isinstance(value, dict):
+            return value
+        return value.get("$numberInt")
+
     class Config:
         allow_population_by_field_name = True
         schema_extra = {}
         json_encoders = {
             datetime: lambda v: {"$date": {"$numberLong": int(v.timestamp() * 1000)}},
         }
-        # getter_dict = BurnGetter
 
 
 class BurnDB(DbObject, BurnBase):
