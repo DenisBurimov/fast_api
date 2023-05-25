@@ -1,52 +1,45 @@
-import enum
-
-from pydantic import BaseModel, EmailStr
+from datetime import datetime
+from pydantic import BaseModel, EmailStr, Field, validator
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
 
 
-class UsersExpectations(str, enum.Enum):
-    sleep = "sleep"
-    energetic = "energetic"
-    productivity = "productivity"
-    stress = "stress"
-    distractions = "distractions"
-
-
-class UsersGender(str, enum.Enum):
-    male = "male"
-    female = "female"
-    nonBinary = "nonBinary"
-    other = "other"
-
-
-# {"_id":{"$oid":"640a17f89d770e182aced59a"},
-# "email":"bla0@a.pl",
-# "password":"$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
-# "firstName":"Krzysztof",
-# "lastName":"Sobol",
-# "age":{"$numberInt":"29"},
-# "expectations":[{"$numberInt":"0"},{"$numberInt":"1"}],
-# "gender":{"$numberInt":"0"},
-# "actvities": "['x', 'y', 'z']"
-# "createdAt":{"$date":{"$numberLong":"1678383096251"}},
-# "updatedAt":{"$date":{"$numberLong":"1678383096251"}},
-# "__v":{"$numberInt":"0"}}
-
-
 class UserBase(BaseModel):
-    username: str  # V
+    id: str | None = Field(alias="_id")
     email: EmailStr  # V
-    firstname: str  # To remove
-    lastname: str  # To remove
+    firstname: str = Field(alias="firstName")  # To remove?
+    lastname: str = Field(alias="lastName")  # To remove?
     age: int  # V
-    expectations: UsersExpectations  # V
-    gender: UsersGender  # V
+    expectations: list  # V
+    gender: int  # V
+    created_at: datetime | None
+    updated_at: datetime | None
 
-    # To add:
-    # created_at
-    # upated_at
+    @validator("id", pre=True)
+    def id_from_dict(cls, value: dict):
+        if not isinstance(value, dict):
+            return value
+        return value.get("$oid")
+
+    @validator("age", pre=True)
+    def age_from_dict(cls, value: dict):
+        if not isinstance(value, dict):
+            return value
+        return value.get("$numberInt")
+
+    @validator("gender", pre=True)
+    def gender_from_dict(cls, value: dict):
+        if not isinstance(value, dict):
+            return value
+        return value.get("$numberInt")
+
+    @validator("expectations", pre=True)
+    def expectations_from_list(cls, value: list):
+        if not isinstance(value, list) or not isinstance(value[0], dict):
+            return value
+
+        return [value[0].get("$numberInt"), value[1].get("$numberInt")]
 
 
 class UserCreate(UserBase):
@@ -68,8 +61,8 @@ class UserUpdate(BaseModel):
     firstname: str | None
     lastname: str | None
     age: int | None
-    expectations: UsersExpectations | None
-    gender: UsersGender | None
+    expectations: list | None
+    gender: int | None
 
 
 class UserDB(DbObject, UserBase):

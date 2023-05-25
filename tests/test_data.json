@@ -1,87 +1,266 @@
 {
   "test_users": [
     {
-      "username": "testuser1",
-      "email": "testemail1@gmail.com",
-      "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
-      "age": 56,
-      "expectations": "sleep",
-      "gender": "male"
+      "_id": {
+        "$oid": "640a17f89d770e182aced59a"
+      },
+      "email": "test_user_01@example.com",
+      "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+      "firstName": "First_01",
+      "lastName": "Last_01",
+      "age": {
+        "$numberInt": "29"
+      },
+      "expectations": [
+        {
+          "$numberInt": "0"
+        },
+        {
+          "$numberInt": "1"
+        }
+      ],
+      "gender": {
+        "$numberInt": "0"
+      },
+      "actvities": "['x', 'y', 'z']",
+      "createdAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "updatedAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "__v": {
+        "$numberInt": "0"
+      }
     },
     {
-      "username": "testuser2",
-      "email": "testemail2@gmail.com",
-      "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
-      "age": 56,
-      "expectations": "sleep",
-      "gender": "male"
+      "_id": {
+        "$oid": "640a17f89d770e182aced59a"
+      },
+      "email": "test_user_02@example.com",
+      "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+      "firstName": "First_02",
+      "lastName": "Last_02",
+      "age": {
+        "$numberInt": "29"
+      },
+      "expectations": [
+        {
+          "$numberInt": "0"
+        },
+        {
+          "$numberInt": "1"
+        }
+      ],
+      "gender": {
+        "$numberInt": "0"
+      },
+      "actvities": "['x', 'y', 'z']",
+      "createdAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "updatedAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "__v": {
+        "$numberInt": "0"
+      }
     },
     {
-      "username": "testuser3",
-      "email": "testemail3@gmail.com",
-      "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
-      "age": 56,
-      "expectations": "sleep",
-      "gender": "male"
+      "_id": {
+        "$oid": "640a17f89d770e182aced59a"
+      },
+      "email": "test_user_03@example.com",
+      "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+      "firstName": "First_03",
+      "lastName": "Last_03",
+      "age": {
+        "$numberInt": "29"
+      },
+      "expectations": [
+        {
+          "$numberInt": "0"
+        },
+        {
+          "$numberInt": "1"
+        }
+      ],
+      "gender": {
+        "$numberInt": "0"
+      },
+      "actvities": "['x', 'y', 'z']",
+      "createdAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "updatedAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "__v": {
+        "$numberInt": "0"
+      }
     }
   ],
   "test_authorized_users": [
     {
-      "username": "test_authorized_user1",
-      "email": "test_authorized_email1@gmail.com",
-      "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
-      "age": 56,
-      "expectations": "sleep",
-      "gender": "male"
+      "_id": {
+        "$oid": "640a17f89d770e182aced59c"
+      },
+      "email": "taras@simple2b.net",
+      "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+      "firstName": "Taras",
+      "lastName": "Lysak",
+      "age": {
+        "$numberInt": "32"
+      },
+      "expectations": [
+        {
+          "$numberInt": "0"
+        },
+        {
+          "$numberInt": "1"
+        }
+      ],
+      "gender": {
+        "$numberInt": "0"
+      },
+      "actvities": "['x', 'y', 'z']",
+      "createdAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "updatedAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "__v": {
+        "$numberInt": "0"
+      }
     },
     {
-      "username": "test_authorized_user2",
-      "email": "test_authorized_email2@gmail.com",
-      "password": "1233",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
-      "age": 56,
-      "expectations": "sleep",
-      "gender": "male"
-    },
-    {
-      "username": "test_authorized_user3",
-      "email": "test_authorized_email3@gmail.com",
-      "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
-      "age": 56,
-      "expectations": "sleep",
-      "gender": "male"
+      "_id": {
+        "$oid": "640a17f89d770e182aced59a"
+      },
+      "email": "bla0@a.pl",
+      "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+      "firstName": "Krzysztof",
+      "lastName": "Sobol",
+      "age": {
+        "$numberInt": "29"
+      },
+      "expectations": [
+        {
+          "$numberInt": "0"
+        },
+        {
+          "$numberInt": "1"
+        }
+      ],
+      "gender": {
+        "$numberInt": "0"
+      },
+      "actvities": "['x', 'y', 'z']",
+      "createdAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "updatedAt": {
+        "$date": {
+          "$numberLong": "1678383096251"
+        }
+      },
+      "__v": {
+        "$numberInt": "0"
+      }
     }
   ],
   "test_user": {
-    "email": "test@gmail.com",
-    "username": "test_username",
-    "password": "test_password",
-    "firstname": "TesterFirst",
-    "lastname": "TesterLast",
-    "age": 56,
-    "expectations": "sleep",
-    "gender": "male"
+    "_id": {
+      "$oid": "640a17f89d770e182aced59a"
+    },
+    "email": "bla0@a.pl",
+    "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+    "firstName": "Krzysztof",
+    "lastName": "Sobol",
+    "age": {
+      "$numberInt": "29"
+    },
+    "expectations": [
+      {
+        "$numberInt": "0"
+      },
+      {
+        "$numberInt": "1"
+      }
+    ],
+    "gender": {
+      "$numberInt": "0"
+    },
+    "actvities": "['x', 'y', 'z']",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1678383096251"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1678383096251"
+      }
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
   },
   "test_superuser": {
-    "username": "test_superuser",
-    "email": "test_superuser@gmail.com",
-    "password": "1234",
-    "firstname": "TesterFirst",
-    "lastname": "TesterLast",
-    "age": 56,
-    "expectations": "sleep",
-    "gender": "male"
+    "_id": {
+      "$oid": "640a17f89d770e182aced59a"
+    },
+    "email": "denysburimov@gmail.com",
+    "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
+    "firstName": "Denys",
+    "lastName": "Burimov",
+    "age": {
+      "$numberInt": "41"
+    },
+    "expectations": [
+      {
+        "$numberInt": "0"
+      },
+      {
+        "$numberInt": "1"
+      }
+    ],
+    "gender": {
+      "$numberInt": "0"
+    },
+    "actvities": "['x', 'y', 'z']",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1678383096251"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1678383096251"
+      }
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
   },
   "test_sleep_items": [
     {

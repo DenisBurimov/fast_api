@@ -1,9 +1,6 @@
-from typing import Any
 from datetime import datetime
 from pydantic import BaseModel, Field, validator
-from pydantic.utils import GetterDict
 from bson.objectid import ObjectId
-
 from .db_object import DbObject
 
 
@@ -14,7 +11,7 @@ class BurnBase(BaseModel):
     v: int = Field(alias="__v")
 
     @validator("id", pre=True)
-    def id_from_dict(cls, value: dict):
+    def id_from_dict(cls, value: dict) -> str:
         if not isinstance(value, dict):
             return value
         return value.get("$oid")
