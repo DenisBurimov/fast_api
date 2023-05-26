@@ -8,7 +8,6 @@ class Settings(BaseSettings):
     ADMIN_USER: str = "admin"
     ADMIN_PASS: str = "admin"
     ADMIN_EMAIL: EmailStr = "admin@admin.com"
-    MONGO_URI: str
     MONGO_DB: str
     MONGO_INITDB_ROOT_USERNAME: str
     MONGO_INITDB_ROOT_PASSWORD: str

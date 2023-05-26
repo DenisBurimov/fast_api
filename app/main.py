@@ -13,4 +13,4 @@ app.include_router(router)
 
 @app.get("/")
 def root():
-    return {"message": "Hello", "env_var": settings.MONGO_URI}
+    return {"message": "Hello", "env_var": settings.MONGO_HOST}
