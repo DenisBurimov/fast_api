@@ -4,8 +4,7 @@
       "username": "testuser1",
       "email": "testemail1@gmail.com",
       "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
+      "name": "TesterFirst",
       "age": 56,
       "expectations": "sleep",
       "gender": "male"
@@ -14,8 +13,7 @@
       "username": "testuser2",
       "email": "testemail2@gmail.com",
       "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
+      "name": "TesterFirst",
       "age": 56,
       "expectations": "sleep",
       "gender": "male"
@@ -24,8 +22,7 @@
       "username": "testuser3",
       "email": "testemail3@gmail.com",
       "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
+      "name": "TesterFirst",
       "age": 56,
       "expectations": "sleep",
       "gender": "male"
@@ -36,8 +33,7 @@
       "username": "test_authorized_user1",
       "email": "test_authorized_email1@gmail.com",
       "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
+      "name": "TesterFirst",
       "age": 56,
       "expectations": "sleep",
       "gender": "male"
@@ -46,8 +42,7 @@
       "username": "test_authorized_user2",
       "email": "test_authorized_email2@gmail.com",
       "password": "1233",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
+      "name": "TesterFirst",
       "age": 56,
       "expectations": "sleep",
       "gender": "male"
@@ -56,8 +51,7 @@
       "username": "test_authorized_user3",
       "email": "test_authorized_email3@gmail.com",
       "password": "1234",
-      "firstname": "TesterFirst",
-      "lastname": "TesterLast",
+      "name": "TesterFirst",
       "age": 56,
       "expectations": "sleep",
       "gender": "male"
@@ -67,8 +61,7 @@
     "email": "test@gmail.com",
     "username": "test_username",
     "password": "test_password",
-    "firstname": "TesterFirst",
-    "lastname": "TesterLast",
+    "name": "TesterFirst",
     "age": 56,
     "expectations": "sleep",
     "gender": "male"
@@ -77,8 +70,7 @@
     "username": "test_superuser",
     "email": "test_superuser@gmail.com",
     "password": "1234",
-    "firstname": "TesterFirst",
-    "lastname": "TesterLast",
+    "name": "TesterFirst",
     "age": 56,
     "expectations": "sleep",
     "gender": "male"

@@ -20,7 +20,7 @@ def username(
     res = db.users.find_one(
         {
             "$or": [
-                {"username": user_credentials.username},
+                {"name": user_credentials.username},
                 {"email": user_credentials.username},
             ]
         }

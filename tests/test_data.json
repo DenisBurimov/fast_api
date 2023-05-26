@@ -6,8 +6,7 @@
       },
       "email": "test_user_01@example.com",
       "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
-      "firstName": "First_01",
-      "lastName": "Last_01",
+      "name": "First_01",
       "age": {
         "$numberInt": "29"
       },
@@ -43,8 +42,7 @@
       },
       "email": "test_user_02@example.com",
       "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
-      "firstName": "First_02",
-      "lastName": "Last_02",
+      "name": "First_02",
       "age": {
         "$numberInt": "29"
       },
@@ -80,8 +78,7 @@
       },
       "email": "test_user_03@example.com",
       "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
-      "firstName": "First_03",
-      "lastName": "Last_03",
+      "name": "First_03",
       "age": {
         "$numberInt": "29"
       },
@@ -119,8 +116,7 @@
       },
       "email": "taras@simple2b.net",
       "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
-      "firstName": "Taras",
-      "lastName": "Lysak",
+      "name": "Taras",
       "age": {
         "$numberInt": "32"
       },
@@ -156,8 +152,7 @@
       },
       "email": "bla0@a.pl",
       "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
-      "firstName": "Krzysztof",
-      "lastName": "Sobol",
+      "name": "Krzysztof",
       "age": {
         "$numberInt": "29"
       },
@@ -194,8 +189,7 @@
     },
     "email": "bla0@a.pl",
     "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
-    "firstName": "Krzysztof",
-    "lastName": "Sobol",
+    "name": "Krzysztof",
     "age": {
       "$numberInt": "29"
     },
@@ -231,8 +225,7 @@
     },
     "email": "denysburimov@gmail.com",
     "password": "$2b$10$Ce1nP/Mq.REL8WfaWgSxsOTvR2Z5I.ekr4lrJpleG2asmYLo7WsUq",
-    "firstName": "Denys",
-    "lastName": "Burimov",
+    "name": "Denys",
     "age": {
       "$numberInt": "41"
     },

@@ -8,8 +8,7 @@ from .db_object import DbObject
 class UserBase(BaseModel):
     id: str | None = Field(alias="_id")
     email: EmailStr
-    firstname: str = Field(alias="firstName")  # To remove?
-    lastname: str = Field(alias="lastName")  # To remove?
+    name: str
     age: int
     expectations: list
     gender: int
@@ -58,8 +57,7 @@ class UserUpdate(BaseModel):
     username: str | None
     email: EmailStr | None
     password: str | None
-    firstname: str | None
-    lastname: str | None
+    name: str | None
     age: int | None
     expectations: list | None
     gender: int | None
