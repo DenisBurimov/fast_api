@@ -12,8 +12,8 @@ class UserBase(BaseModel):
     age: int
     expectations: list
     gender: int
-    created_at: datetime | None
-    updated_at: datetime | None
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="createdAt")
 
     @validator("id", pre=True)
     def id_from_dict(cls, value: dict):
@@ -39,6 +39,28 @@ class UserBase(BaseModel):
             return value
 
         return [value[0].get("$numberInt"), value[1].get("$numberInt")]
+
+    @validator("created_at", pre=True)
+    def created_at_from_dict(cls, value: dict) -> datetime:
+        if not isinstance(value, dict):
+            return value
+        if "$date" not in value:
+            raise ValueError("Unexpected date format!")
+
+        py_timestamp = int(value["$date"]["$numberLong"])
+
+        return datetime.fromtimestamp(py_timestamp / 1000)
+
+    @validator("updated_at", pre=True)
+    def updated_at_from_dict(cls, value: dict) -> datetime:
+        if not isinstance(value, dict):
+            return value
+        if "$date" not in value:
+            raise ValueError("Unexpected date format!")
+
+        py_timestamp = int(value["$date"]["$numberLong"])
+
+        return datetime.fromtimestamp(py_timestamp / 1000)
 
 
 class UserCreate(UserBase):

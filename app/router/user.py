@@ -15,6 +15,14 @@ def get_users(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
+    """
+    Args:
+        db (Database, optional): db generator.
+        _ (s.UserDB, optional): Requires logged in user.
+
+    Returns:
+        schema.UserList class with users field, which is a list of UserDB classes.
+    """
     return s.UserList(users=[s.UserDB.parse_obj(o) for o in db.users.find()])
 
 
@@ -24,6 +32,18 @@ def get_user_by_id(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
+    """
+    Args:
+        id (str): String with users id (not an ObjectID!).
+        db (Database, optional): db generator.
+        _ (s.UserDB, optional): Requires logged in user.
+
+    Raises:
+        HTTPException: in case if user with given id was not found.
+
+    Returns:
+        schema.UserDB parsed by pydantic from the mongo object.
+    """
     user = db.users.find_one({"_id": ObjectId(id)})
     if not user:
         raise HTTPException(status_code=404, detail="This user was not found")

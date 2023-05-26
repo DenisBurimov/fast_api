@@ -24,6 +24,16 @@ def test_auth(client: TestClient, db: Database, test_data: TestData):
     response = client.post(
         "api/auth/login",
         data=s.UserLogin(
+            username=test_data.test_users[0].name,
+            password=test_data.test_users[0].password,
+        ).dict(),
+    )
+    assert response and response.status_code == 200, "unexpected response"
+
+    # login by email and password
+    response = client.post(
+        "api/auth/login",
+        data=s.UserLogin(
             username=test_data.test_users[0].email,
             password=test_data.test_users[0].password,
         ).dict(),

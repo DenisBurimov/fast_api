@@ -47,6 +47,14 @@ def sign_up(
     data: s.UserCreate,
     db: Database = Depends(get_db),
 ):
+    """
+    Args:
+        data (s.UserCreate): validated by pydantic user credentials.
+        db (Database, optional): db generator.
+
+    Returns:
+        schema.UserDB class that parses a new db user's instance.
+    """
     data.password_hash = make_hash(data.password)
     res: results.InsertOneResult = db.users.insert_one(
         data.dict(exclude={"password": True})

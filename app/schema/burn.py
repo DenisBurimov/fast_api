@@ -41,7 +41,14 @@ class BurnBase(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-        schema_extra = {}
+        schema_extra = {
+            "example": {
+                "_id": {"$oid": "640a17f89d770e182aced59a"},
+                "burn_values": "[0.7, -0.9, 1.1, -0.5]",
+                "createdAt": {"$date": {"$numberLong": "1678383096251"}},
+                "__v": {"$numberInt": "0"},
+            }
+        }
         json_encoders = {
             datetime: lambda v: {"$date": {"$numberLong": int(v.timestamp() * 1000)}},
         }

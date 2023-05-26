@@ -33,6 +33,20 @@ class JournalBase(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "_id": {"$oid": "640a17f89d770e182aced53a"},
+                "sleep_duration": {"$numberInt": "389"},
+                "activities": [
+                    {"activity": "meditation", "duration": 20, "timing": 3},
+                    {"activity": "ice_bath", "duration": 20, "timing": 2},
+                    {"activity": "supplements", "amount": 200, "timing": 1},
+                    {"activity": "relax", "timing": 4},
+                ],
+                "createdAt": {"$date": {"$numberLong": "1678383096251"}},
+                "__v": {"$numberInt": "0"},
+            }
+        }
         json_encoders = {
             datetime: lambda v: {"$date": {"$numberLong": int(v.timestamp() * 1000)}},
         }
