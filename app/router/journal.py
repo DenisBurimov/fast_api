@@ -18,7 +18,6 @@ def add_journal_item(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    # res: results.InsertOneResult = db.journal_items.insert_one(data.dict())
     res: results.InsertOneResult = db.journal_items.insert_one(
         {
             "_id": ObjectId(data.id),
@@ -28,7 +27,9 @@ def add_journal_item(
         }
     )
 
-    log(log.INFO, "Journal item [%s] has been saved", res.inserted_id)
+    if res:
+        log(log.INFO, "Journal item [%s] has been saved", res.inserted_id)
+    log(log.INFO, "Something went wrong. Journal item has not been saved")
     return s.JournalDB.parse_obj(db.journal_items.find_one({"_id": res.inserted_id}))
 
 
@@ -62,7 +63,7 @@ def get_journal_item_by_id(
 
 
 @journal_router.delete("/{id}", response_model=s.DeleteMessage)
-def get_delete_user(
+def get_delete_journal_id(
     id: str,
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
@@ -71,5 +72,6 @@ def get_delete_user(
     if not res.deleted_count:
         raise HTTPException(status_code=404, detail="This user was not found")
 
+    log(log.INFO, "JournalDB [%s] was successfully deleted", id)
     message = f"JournalDB {id} was successfully deleted"
     return s.DeleteMessage(message=message)
