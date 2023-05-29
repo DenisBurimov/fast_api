@@ -18,7 +18,15 @@ def add_journal_item(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    res: results.InsertOneResult = db.journal_items.insert_one(data.dict())
+    # res: results.InsertOneResult = db.journal_items.insert_one(data.dict())
+    res: results.InsertOneResult = db.journal_items.insert_one(
+        {
+            "_id": ObjectId(data.id),
+            "sleep_duration": data.sleep_duration,
+            "activities": data.activities,
+            "created_at": data.created_at,
+        }
+    )
 
     log(log.INFO, "Journal item [%s] has been saved", res.inserted_id)
     return s.JournalDB.parse_obj(db.journal_items.find_one({"_id": res.inserted_id}))
@@ -29,9 +37,13 @@ def get_journal_items(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    return s.JournalList(
+    journal_items = s.JournalList(
         journal_items=[s.JournalDB.parse_obj(o) for o in db.journal_items.find()]
     )
+    if not journal_items:
+        log(log.INFO, "Failed to get journal items")
+    log(log.INFO, "Got [%d] journal items", len(journal_items.journal_items))
+    return journal_items
 
 
 @journal_router.get("/{id}", response_model=s.JournalDB)
@@ -42,8 +54,10 @@ def get_journal_item_by_id(
 ):
     journal_item = db.journal_items.find_one({"_id": ObjectId(id)})
     if not journal_item:
+        log(log.INFO, "Failed to get journal item with id: %s", id)
         raise HTTPException(status_code=404, detail="This journal item was not found")
 
+    log(log.INFO, "journal item %s: %s", id, journal_item)
     return s.JournalDB.parse_obj(journal_item)
 
 
