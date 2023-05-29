@@ -18,6 +18,11 @@ def add_journal_item(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
+    journal_item = db.journal_items.find_one({"_id": ObjectId(data.id)})
+    if journal_item:
+        log(log.ERROR, "Journal item [%s] already exists", data.id)
+        raise HTTPException(status_code=409, detail="Journal item already exists")
+
     res: results.InsertOneResult = db.journal_items.insert_one(
         {
             "_id": ObjectId(data.id),
