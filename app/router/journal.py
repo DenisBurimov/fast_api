@@ -18,12 +18,22 @@ def add_journal_item(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
+    """
+    Args:
+        data (s.JournalBase): sleep item class instance.
+        db (Database, optional): db generator.
+        _ (s.UserDB, optional): Requires logged in user.
+
+    Returns:
+        schema.JournalBase class instance parsed by pydantic from the mongo object.
+    """
     journal_item = db.journal_items.find_one({"_id": ObjectId(data.id)})
     if journal_item:
         log(log.ERROR, "Journal item [%s] already exists", data.id)
         raise HTTPException(status_code=409, detail="Journal item already exists")
 
     res: results.InsertOneResult = db.journal_items.insert_one(
+        # We can't just pass data.dict() because mongo will give the new instance a new random id
         {
             "_id": ObjectId(data.id),
             "sleep_duration": data.sleep_duration,
@@ -43,6 +53,15 @@ def get_journal_items(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
+    """
+    Args:
+        db (Database, optional): db generator.
+        _ (s.UserDB, optional): Requires logged in user.
+
+    Returns:
+        schema.JournalList class instance with journal_items field, that contains all journal items
+        It is a list of parsed with pydantic objects of journal_items collection from the db
+    """
     journal_items = s.JournalList(
         journal_items=[s.JournalDB.parse_obj(o) for o in db.journal_items.find()]
     )
@@ -58,12 +77,24 @@ def get_journal_item_by_id(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
+    """
+    Args:
+        id (str): String with users id (not an ObjectID!).
+        db (Database, optional): db generator.
+        _ (s.UserDB, optional): Requires logged in user.
+
+    Raises:
+        HTTPException: 404 if journal item with given id was not found.
+
+    Returns:
+        schema.JournalDB class instance parsed by pydantic from the mongo object.
+    """
     journal_item = db.journal_items.find_one({"_id": ObjectId(id)})
     if not journal_item:
         log(log.INFO, "Failed to get journal item with id: %s", id)
         raise HTTPException(status_code=404, detail="This journal item was not found")
 
-    log(log.INFO, "journal item %s: %s", id, journal_item)
+    log(log.INFO, "Journal item %s: %s", id, journal_item)
     return s.JournalDB.parse_obj(journal_item)
 
 
@@ -75,8 +106,9 @@ def get_delete_journal_id(
 ):
     res: results.DeleteResult = db.journal_items.delete_one({"_id": ObjectId(id)})
     if not res.deleted_count:
+        log(log.ERROR, "Journal item [%s] was not found", id)
         raise HTTPException(status_code=404, detail="This user was not found")
 
-    log(log.INFO, "JournalDB [%s] was successfully deleted", id)
-    message = f"JournalDB {id} was successfully deleted"
+    log(log.INFO, "Journal item [%s] was successfully deleted", id)
+    message = f"Journal item {id} was successfully deleted"
     return s.DeleteMessage(message=message)

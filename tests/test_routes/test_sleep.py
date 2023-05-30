@@ -48,3 +48,14 @@ def test_get_sleep_item_by_id(client_a: TestClient, db: Database, test_data: Tes
     response = client_a.get(f"api/sleep/{str(item_to_get_id)}")
     assert response.status_code == 200
     assert s.SleepDB.parse_obj(response.json()).id == item_to_get_id
+
+
+def test_delete_sleep_item(client_a: TestClient, db: Database, test_data: TestData):
+    test_sleep_item: s.SleepDB = s.SleepDB.parse_obj(db.sleep_items.find_one())
+    sleep_items_number_before = db.sleep_items.count_documents({})
+
+    response = client_a.delete(f"api/sleep/{test_sleep_item.id}")
+    assert response and response.status_code == 200
+
+    sleep_items_number_after = db.sleep_items.count_documents({})
+    assert sleep_items_number_before > sleep_items_number_after

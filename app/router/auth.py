@@ -17,6 +17,17 @@ def username(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Database = Depends(get_db),
 ):
+    """
+    Args:
+        user_credentials: OAuth2PasswordRequestForm.
+        db: database generator.
+
+    Raises:
+        HTTPException: if doesn't find name or email or they don't match with password
+
+    Returns:
+        Session token if the auth with name or email was successful
+    """
     res = db.users.find_one(
         {
             "$or": [
@@ -67,6 +78,7 @@ def sign_up(
 
     data.password_hash = make_hash(data.password)
     res: results.InsertOneResult = db.users.insert_one(
+        # We can't just pass data.dict() because mongo will give the new instance a new random id
         {
             "_id": ObjectId(data.id),
             "name": data.name,

@@ -26,3 +26,14 @@ def test_get_burn_item_by_id(client_a: TestClient, db: Database):
     response = client_a.get(f"api/burn/{str(item_to_get_id)}")
     assert response.status_code == 200
     assert s.BurnDB.parse_obj(response.json()).id == item_to_get_id
+
+
+def test_delete_burn_item(client_a: TestClient, db: Database, test_data: TestData):
+    test_burn_item: s.BurnDB = s.BurnDB.parse_obj(db.burn_items.find_one())
+    burn_items_number_before = db.burn_items.count_documents({})
+
+    response = client_a.delete(f"api/burn/{test_burn_item.id}")
+    assert response and response.status_code == 200
+
+    burn_items_number_after = db.burn_items.count_documents({})
+    assert burn_items_number_before > burn_items_number_after

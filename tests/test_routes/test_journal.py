@@ -27,3 +27,14 @@ def test_get_journal_item_by_id(
     response = client_a.get(f"api/journal/{str(item_to_get_id)}")
     assert response.status_code == 200
     assert s.JournalDB.parse_obj(response.json()).id == item_to_get_id
+
+
+def test_delete_journal_item(client_a: TestClient, db: Database, test_data: TestData):
+    test_journal_item: s.JournalDB = s.JournalDB.parse_obj(db.journal_items.find_one())
+    journal_items_number_before = db.journal_items.count_documents({})
+
+    response = client_a.delete(f"api/journal/{test_journal_item.id}")
+    assert response and response.status_code == 200
+
+    journal_items_number_after = db.journal_items.count_documents({})
+    assert journal_items_number_before > journal_items_number_after
