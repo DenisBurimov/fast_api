@@ -1,5 +1,6 @@
 # flake8: noqa F402
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from pymongo import MongoClient
 from app.router import router
 from app.config import Settings, get_settings
@@ -13,4 +14,4 @@ app.include_router(router)
 
 @app.get("/")
 def root():
-    return {"message": "Hello", "env_var": settings.MONGO_HOST}
+    return RedirectResponse("/docs", status_code=303)
