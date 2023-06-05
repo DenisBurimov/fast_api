@@ -2,26 +2,22 @@ from typing import Generator
 
 import pytest
 from pydantic import BaseModel
-
-
-class TestUser(BaseModel):
-    __test__ = False
-
-    username: str
-    email: str
-    password: str
-    is_verified: bool | None = True
+from app import schema as s
 
 
 class TestData(BaseModel):
     __test__ = False
 
-    test_user: TestUser | None
-    test_users: list[TestUser]
+    test_user: s.UserCreate | None
+    test_users: list[s.UserCreate]
 
     # authorized
-    test_authorized_users: list[TestUser]
-    test_superuser: TestUser | None
+    test_authorized_users: list[s.UserCreate]
+    test_superuser: s.UserCreate | None
+
+    test_sleep_items: list[s.SleepBase]
+    test_burn_items: list[s.BurnBase]
+    test_journal_items: list[s.JournalBase]
 
 
 @pytest.fixture
