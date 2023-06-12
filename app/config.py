@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     MONGO_DB: str
     MONGO_INITDB_ROOT_USERNAME: str
     MONGO_INITDB_ROOT_PASSWORD: str
-    MONGO_LOCAL_HOST: str
-    MONGO_LOCAL_PORT: int
+    MONGO_HOST: str
+    MONGO_PORT: int
     BURN_MODEL_URL: str
 
     class Config:
