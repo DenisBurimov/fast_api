@@ -7,13 +7,13 @@ from .config import get_settings
 
 settings = get_settings()
 
-MONGO_LOCAL_HOST = settings.MONGO_LOCAL_HOST
-MONGO_LOCAL_PORT = settings.MONGO_LOCAL_PORT
+MONGO_HOST = settings.MONGO_HOST
+MONGO_PORT = settings.MONGO_PORT
 MONGO_INITDB_ROOT_USERNAME = settings.MONGO_INITDB_ROOT_USERNAME
 MONGO_INITDB_ROOT_PASSWORD = settings.MONGO_INITDB_ROOT_PASSWORD
 # mongo = MongoClient(host=["mongo"], username="user", password="pass")
 # mongo = MongoClient(
-#     host=[MONGO_LOCAL_HOST],
+#     host=[MONGO_HOST],
 #     username=MONGO_INITDB_ROOT_USERNAME,
 #     password=MONGO_INITDB_ROOT_PASSWORD,
 # )
