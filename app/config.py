@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     MONGO_INITDB_ROOT_PASSWORD: str
     MONGO_LOCAL_HOST: str
     MONGO_LOCAL_PORT: int
+    BURN_MODEL_URL: str
 
     class Config:
         env_file = ["project.env", ".env"]

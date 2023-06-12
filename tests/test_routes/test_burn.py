@@ -1,3 +1,4 @@
+import json
 from fastapi.testclient import TestClient
 from pymongo.database import Database
 import app.schema as s
@@ -6,9 +7,13 @@ from tests.fixture import TestData
 
 def test_create_burn_item(client_a: TestClient, db: Database, test_data: TestData):
     burn_items_number_before = db.burn_items.count_documents({})
+    # with open("tests/burn_example.json") as f:
+    with open("tests/test_burn.json") as f:
+        data = json.load(f)
     response = client_a.post(
         "api/burn/add",
-        json=test_data.test_burn_items[0].dict(),
+        # json=test_data.test_burn_items[0].dict(),
+        json=data,
     )
     burn_items_number_after = db.burn_items.count_documents({})
     assert response.status_code == 201

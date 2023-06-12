@@ -93,3 +93,16 @@ class BurnList(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: lambda v: str(v)}
+
+
+class BurnResultBody(BaseModel):
+    burn_rating: int
+    gaze_error: int
+    reaction_time: int
+    eye_droop: int
+
+
+class BurnResult(BaseModel):
+    statusCode: int
+    headers: dict
+    body: str
