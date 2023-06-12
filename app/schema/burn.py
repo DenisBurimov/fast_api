@@ -106,3 +106,14 @@ class BurnResult(BaseModel):
     statusCode: int
     headers: dict
     body: str
+
+
+class BurnResultDB(BaseModel):
+    burn_values: list[int]
+    created_at: str
+
+
+class BurnTimestamps(BaseModel):
+    beginTimeZone: str
+    beginTime: str
+    endTime: str

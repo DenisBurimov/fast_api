@@ -17,7 +17,7 @@ settings: Settings = get_settings()
 
 
 @burn_router.post(
-    "/add", status_code=status.HTTP_201_CREATED, response_model=s.BurnResultBody
+    "/add", status_code=status.HTTP_201_CREATED, response_model=s.BurnResultDB
 )
 def add_burn_item(
     data: s.BurnBase,
@@ -34,30 +34,28 @@ def add_burn_item(
     We don't save BurnRaw items to the database
     """
     # Here we have to send data (s.BurnRaw) to the ML
-    data = dict(body=json.dumps(data.dict()))
+    data_json = dict(body=json.dumps(data.dict()))
     ml_response = requests.post(
         "http://localhost:9000/2015-03-31/functions/function/invocations",
-        # data=data.json(),
-        # json=data.dict(),
-        json=data,
+        json=data_json,
     )
 
     #
     burn_result = s.BurnResult.parse_raw(ml_response.text)
     body = s.BurnResultBody.parse_raw(burn_result.body)
 
+    begin_timezone = s.BurnTimestamps.parse_obj(data.timeStamps).beginTimeZone
+
     burn_rating = 100 if body.burn_rating > 100 else body.burn_rating
-    burn_values = s.BurnResultBody(
-        burn_rating=burn_rating,
-        gaze_error=body.gaze_error,
-        reaction_time=body.reaction_time,
-        eye_droop=body.eye_droop,
+    burn_values = s.BurnResultDB(
+        burn_values=[burn_rating, body.gaze_error, body.reaction_time, body.eye_droop],
+        created_at=begin_timezone,
     )
 
     res: results.InsertOneResult = db.burn_items.insert_one(burn_values.dict())
 
     log(log.INFO, "Burn item [%s] has been saved", res.inserted_id)
-    return s.BurnResultBody.parse_obj(db.burn_items.find_one({"_id": res.inserted_id}))
+    return s.BurnResultDB.parse_obj(db.burn_items.find_one({"_id": res.inserted_id}))
 
 
 @burn_router.get("/all", response_model=s.BurnList)
