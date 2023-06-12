@@ -2,16 +2,16 @@ version: "3.8"
 
 services:
 
-  mongo:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-user}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-pass}
-    volumes:
-      - db_data:/data/db
-    ports:
-      - 127.0.0.1:27017:27017
+  # mongo:
+  #   image: mongo
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-user}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-pass}
+  #   volumes:
+  #     - db_data:/data/db
+  #   ports:
+  #     - 127.0.0.1:27017:27017
 
   # mongo-express:
   #   image: mongo-express
