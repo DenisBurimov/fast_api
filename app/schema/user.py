@@ -47,7 +47,7 @@ class UserUpdate(BaseModel):
     email: EmailStr | None
     name: str | None
     password: str | None
-    activities: UserActivities | None
+    activities: list[UserActivities] | None
     goals: list[UsersGoals] | None
 
 
