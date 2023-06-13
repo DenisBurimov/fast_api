@@ -4,12 +4,35 @@ import app.schema as s
 from tests.fixture import TestData
 
 
+TEST_USER = {
+    "email": "testemail1@gmail.com",
+    "name": "testuser1",
+    "password": "1234",
+    "actvities": [
+        "caffeine",
+        "meditation",
+        "supplements",
+        "alcohol",
+        "coldhotTherapy",
+        "marijuana",
+    ],
+    "goals": [
+        "enhancedFocus",
+        "betterSleep",
+        "mindfulness",
+        "breakHabits",
+        "removeDistractions",
+        "marijuana",
+    ],
+}
+
+
 def test_auth(client: TestClient, db: Database, test_data: TestData):
     # login by username and password
     response = client.post(
         "api/auth/login",
         data=s.UserLogin(
-            username=test_data.test_users[0].username,
+            username=test_data.test_users[0].name,
             password=test_data.test_users[0].password,
         ).dict(),
     )
@@ -42,11 +65,11 @@ def test_get_user_by_id(client_a: TestClient, db: Database, test_data: TestData)
 def test_update_user(client_a: TestClient, db: Database, test_data: TestData):
     test_user: s.UserDB = s.UserDB.parse_obj(db.users.find_one())
     email_before = test_user.email
-    username_before = test_user.username
+    username_before = test_user.name
     response = client_a.put(
         f"api/user/{test_user.id}",
         json=s.UserUpdate(
-            username="New Username",
+            name="New Username",
             email="new_email@gmail.com",
         ).dict(exclude_none=True),
     )
@@ -57,7 +80,7 @@ def test_update_user(client_a: TestClient, db: Database, test_data: TestData):
     response = client_a.put(
         f"api/user/{test_user.id}",
         json=s.UserUpdate(
-            username=username_before,
+            name=username_before,
             email=email_before,
         ).dict(),
     )

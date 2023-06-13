@@ -6,29 +6,29 @@ from bson.objectid import ObjectId
 from .db_object import DbObject
 
 
-class UsersExpectations(str, enum.Enum):
-    sleep = "sleep"
-    energetic = "energetic"
-    productivity = "productivity"
-    stress = "stress"
-    distractions = "distractions"
+class UserActivities(str, enum.Enum):
+    caffeine = "caffeine"
+    meditation = "meditation"
+    supplements = "supplements"
+    alcohol = "alcohol"
+    coldhotTherapy = "coldhotTherapy"
+    marijuana = "marijuana"
 
 
-class UsersGender(str, enum.Enum):
-    male = "male"
-    female = "female"
-    nonBinary = "nonBinary"
-    other = "other"
+class UsersGoals(str, enum.Enum):
+    enhancedFocus = "enhancedFocus"
+    betterSleep = "betterSleep"
+    mindfullness = "mindfulness"
+    breakHabits = "breakHabits"
+    removeDistractions = "removeDistractions"
+    marijuana = "marijuana"
 
 
 class UserBase(BaseModel):
-    username: str
     email: EmailStr
-    firstname: str
-    lastname: str
-    age: int
-    expectations: UsersExpectations
-    gender: UsersGender
+    name: str
+    activities: list[UserActivities]
+    goals: list[UsersGoals]
 
 
 class UserCreate(UserBase):
@@ -44,14 +44,11 @@ class UserLogin(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    username: str | None
     email: EmailStr | None
+    name: str | None
     password: str | None
-    firstname: str | None
-    lastname: str | None
-    age: int | None
-    expectations: UsersExpectations | None
-    gender: UsersGender | None
+    activities: UserActivities | None
+    goals: UsersGoals | None
 
 
 class UserDB(DbObject, UserBase):
