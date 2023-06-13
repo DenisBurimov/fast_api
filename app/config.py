@@ -3,6 +3,7 @@ from pydantic import BaseSettings, EmailStr
 
 
 class Settings(BaseSettings):
+    ENV_MODE: str
     JWT_SECRET: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     ADMIN_USER: str = "admin"
@@ -15,6 +16,7 @@ class Settings(BaseSettings):
     MONGO_HOST: str
     MONGO_PORT: int
     BURN_MODEL_URL: str
+    BURN_MODEL_URL_LOCAL: str
 
     class Config:
         env_file = ["project.env", ".env"]

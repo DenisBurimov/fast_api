@@ -1,5 +1,5 @@
 from typing import Union
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
@@ -103,7 +103,7 @@ class BurnResultBody(BaseModel):
 
 
 class BurnResult(BaseModel):
-    statusCode: int
+    status_code: int = Field(alias="statusCode")
     headers: dict
     body: str
 

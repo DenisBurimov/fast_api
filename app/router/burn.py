@@ -1,4 +1,4 @@
-import json
+# import json
 from fastapi import APIRouter, Depends, HTTPException, status
 import requests
 from pymongo.database import Database
@@ -33,15 +33,27 @@ def add_burn_item(
 
     We don't save BurnRaw items to the database
     """
+
     # Here we have to send data (s.BurnRaw) to the ML
-    data_json = dict(body=json.dumps(data.dict()))
+    # data_json = dict(body=json.dumps(data.dict()))
+
+    ML_URL = (
+        settings.BURN_MODEL_URL
+        if settings.ENV_MODE == "production"
+        else settings.BURN_MODEL_URL_LOCAL
+    )
     ml_response = requests.post(
-        "http://localhost:9000/2015-03-31/functions/function/invocations",
-        json=data_json,
+        ML_URL,
+        # json=data_json,
+        json=data.dict(),
     )
 
-    #
-    burn_result = s.BurnResult.parse_raw(ml_response.text)
+    try:
+        burn_result = s.BurnResult.parse_raw(ml_response.text)
+    except Exception:
+        log(log.ERROR, "ML connection error: %s", ml_response.text)
+        raise HTTPException(status_code=400, detail="ML model bad request")
+
     body = s.BurnResultBody.parse_raw(burn_result.body)
 
     begin_timezone = s.BurnTimestamps.parse_obj(data.timeStamps).beginTimeZone
