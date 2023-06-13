@@ -76,7 +76,10 @@ def get_burn_items(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    return s.BurnList(burn_items=[s.BurnDB.parse_obj(o) for o in db.burn_items.find()])
+    all_burn_items = list(db.burn_items.find())
+    if not all_burn_items:
+        return s.BurnList(burn_items=[o for o in all_burn_items])
+    return s.BurnList(burn_items=[s.BurnResultDB.parse_obj(o) for o in all_burn_items])
 
 
 @burn_router.get("/id/{id}", response_model=s.BurnResultDB)

@@ -23,11 +23,18 @@ def test_create_burn_item(client_a: TestClient, db: Database, test_data: TestDat
 
 
 def test_get_all_burn_items(client_a: TestClient, db: Database, test_data: TestData):
+    db.burn_items.insert_many(
+        [
+            {"burn_values": [33, 0, 333, 0], "created_at": "2023-05-05T05:05:05+01:00"},
+            {"burn_values": [55, 0, 555, 0], "created_at": "2023-07-14T07:07:07+07:00"},
+            {"burn_values": [77, 0, 777, 0], "created_at": "2023-12-23T12:12:12+05:00"},
+        ]
+    )
     response = client_a.get("api/burn/all")
     assert response.status_code == 200
     burn_items_list = s.BurnList.parse_obj(response.json())
     assert burn_items_list
-    assert len(burn_items_list.burn_items) == len(test_data.test_burn_items)
+    assert len(burn_items_list.burn_items) == 3
 
 
 def test_get_burn_item_by_id(client_a: TestClient, db: Database, test_data: TestData):
