@@ -48,7 +48,7 @@ class UserUpdate(BaseModel):
     name: str | None
     password: str | None
     activities: UserActivities | None
-    goals: UsersGoals | None
+    goals: list[UsersGoals] | None
 
 
 class UserDB(DbObject, UserBase):
