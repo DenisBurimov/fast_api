@@ -1,4 +1,3 @@
-import json
 from pymongo.database import Database
 from app import schema as s, make_hash
 from tests.fixture import TestData

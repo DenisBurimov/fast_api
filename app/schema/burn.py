@@ -86,15 +86,6 @@ class BurnDB(DbObject, BurnBase):
         json_encoders = {ObjectId: lambda v: str(v)}
 
 
-class BurnList(BaseModel):
-    burn_items: list[BurnDB]
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: lambda v: str(v)}
-
-
 class BurnResultBody(BaseModel):
     burn_rating: int
     gaze_error: int
@@ -111,6 +102,15 @@ class BurnResult(BaseModel):
 class BurnResultDB(BaseModel):
     burn_values: list[int]
     created_at: str
+
+
+class BurnList(BaseModel):
+    burn_items: list[BurnResultDB]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: lambda v: str(v)}
 
 
 class BurnTimestamps(BaseModel):

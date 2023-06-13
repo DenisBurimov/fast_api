@@ -1,4 +1,5 @@
 # import json
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 import requests
 from pymongo.database import Database
@@ -78,7 +79,7 @@ def get_burn_items(
     return s.BurnList(burn_items=[s.BurnDB.parse_obj(o) for o in db.burn_items.find()])
 
 
-@burn_router.get("/id/{id}", response_model=s.BurnDB)
+@burn_router.get("/id/{id}", response_model=s.BurnResultDB)
 def get_burn_item_by_id(
     id: str,
     db: Database = Depends(get_db),
@@ -88,11 +89,11 @@ def get_burn_item_by_id(
     if not burn_item:
         raise HTTPException(status_code=404, detail="This burn item was not found")
 
-    return s.BurnDB.parse_obj(burn_item)
+    return s.BurnResultDB.parse_obj(burn_item)
 
 
-@burn_router.get("/date/{created}", response_model=s.BurnResultDB)
-def get_burn_item_by_date(
+@burn_router.get("/time/{created}", response_model=s.BurnResultDB)
+def get_burn_item_by_time(
     created: str,
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
@@ -104,15 +105,18 @@ def get_burn_item_by_date(
     return s.BurnResultDB.parse_obj(burn_item)
 
 
-@burn_router.delete("/{id}", response_model=s.DeleteMessage)
-def get_delete_user(
-    id: str,
+@burn_router.get("/date/{day}", response_model=s.BurnList)
+def get_burn_item_by_date(
+    day: str,
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    res: results.DeleteResult = db.burn_items.delete_one({"_id": ObjectId(id)})
-    if not res.deleted_count:
-        raise HTTPException(status_code=404, detail="This user was not found")
+    day_str = day.split("T")[0]
+    burns_by_day = list(
+        db.burn_items.find({"created_at": {"$regex": f".*{day_str}.*"}})
+    )
 
-    message = f"BurnDB {id} was successfully deleted"
-    return s.DeleteMessage(message=message)
+    if not burns_by_day:
+        return s.BurnList(burn_items=[o for o in burns_by_day])
+
+    return s.BurnList(burn_items=[s.BurnResultDB.parse_obj(o) for o in burns_by_day])
