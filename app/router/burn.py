@@ -78,7 +78,7 @@ def get_burn_items(
     return s.BurnList(burn_items=[s.BurnDB.parse_obj(o) for o in db.burn_items.find()])
 
 
-@burn_router.get("/{id}", response_model=s.BurnDB)
+@burn_router.get("/id/{id}", response_model=s.BurnDB)
 def get_burn_item_by_id(
     id: str,
     db: Database = Depends(get_db),
@@ -89,6 +89,19 @@ def get_burn_item_by_id(
         raise HTTPException(status_code=404, detail="This burn item was not found")
 
     return s.BurnDB.parse_obj(burn_item)
+
+
+@burn_router.get("/date/{created}", response_model=s.BurnResultDB)
+def get_burn_item_by_date(
+    created: str,
+    db: Database = Depends(get_db),
+    _: s.UserDB = Depends(get_current_user),
+):
+    burn_item = db.burn_items.find_one({"created_at": created})
+    if not burn_item:
+        raise HTTPException(status_code=404, detail="This burn item was not found")
+
+    return s.BurnResultDB.parse_obj(burn_item)
 
 
 @burn_router.delete("/{id}", response_model=s.DeleteMessage)
