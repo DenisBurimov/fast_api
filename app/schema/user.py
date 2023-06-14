@@ -40,7 +40,7 @@ class UserOut(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    password_hash: str = ""
+    password_hash: str | None = ""
 
 
 class UserLogin(BaseModel):
