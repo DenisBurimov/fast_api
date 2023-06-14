@@ -4,29 +4,6 @@ import app.schema as s
 from tests.fixture import TestData
 
 
-TEST_USER = {
-    "email": "testemail1@gmail.com",
-    "name": "testuser1",
-    "password": "1234",
-    "actvities": [
-        "caffeine",
-        "meditation",
-        "supplements",
-        "alcohol",
-        "coldhotTherapy",
-        "marijuana",
-    ],
-    "goals": [
-        "enhancedFocus",
-        "betterSleep",
-        "mindfulness",
-        "breakHabits",
-        "removeDistractions",
-        "marijuana",
-    ],
-}
-
-
 def test_auth(client: TestClient, db: Database, test_data: TestData):
     # login by username and password
     response = client.post(

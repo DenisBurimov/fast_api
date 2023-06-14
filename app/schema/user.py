@@ -27,6 +27,13 @@ class UsersGoals(str, enum.Enum):
 class UserBase(BaseModel):
     email: EmailStr
     name: str
+    activities: list[UserActivities] | None = []
+    goals: list[UsersGoals] | None = []
+
+
+class UserOut(BaseModel):
+    email: EmailStr
+    name: str
     activities: list[UserActivities]
     goals: list[UsersGoals]
 

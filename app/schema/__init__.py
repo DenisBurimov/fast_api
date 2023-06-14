@@ -1,5 +1,13 @@
 # flake8: noqa F401
-from .user import UserList, UserDB, UserLogin, UserUpdate, UserCreate, UserDbWithPasswd
+from .user import (
+    UserList,
+    UserDB,
+    UserLogin,
+    UserUpdate,
+    UserCreate,
+    UserDbWithPasswd,
+    UserOut,
+)
 from .sleep import SleepBase, SleepDB, SleepList
 from .burn import (
     BurnBase,
