@@ -1,5 +1,5 @@
 # import json
-from datetime import datetime
+# from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 import requests
 from pymongo.database import Database
@@ -15,6 +15,27 @@ from app.config import Settings, get_settings
 burn_router = APIRouter(prefix="/burn", tags=["BurnDB"])
 
 settings: Settings = get_settings()
+
+
+def ml_response(data):
+    ML_URL = (
+        settings.BURN_MODEL_URL
+        if settings.ENV_MODE == "production"
+        else settings.BURN_MODEL_URL_LOCAL
+    )
+    ml_response = requests.post(
+        ML_URL,
+        # json=data_json,
+        json=data.dict(),
+    )
+
+    try:
+        burn_result = s.BurnResult.parse_raw(ml_response.text)
+    except Exception:
+        log(log.ERROR, "ML connection error: %s", ml_response.text)
+        raise HTTPException(status_code=400, detail="ML model bad request")
+
+    return burn_result
 
 
 @burn_router.post(
@@ -38,27 +59,9 @@ def add_burn_item(
     # Here we have to send data (s.BurnRaw) to the ML
     # data_json = dict(body=json.dumps(data.dict()))
 
-    ML_URL = (
-        settings.BURN_MODEL_URL
-        if settings.ENV_MODE == "production"
-        else settings.BURN_MODEL_URL_LOCAL
-    )
-    ml_response = requests.post(
-        ML_URL,
-        # json=data_json,
-        json=data.dict(),
-    )
-
-    try:
-        burn_result = s.BurnResult.parse_raw(ml_response.text)
-    except Exception:
-        log(log.ERROR, "ML connection error: %s", ml_response.text)
-        raise HTTPException(status_code=400, detail="ML model bad request")
-
+    burn_result = ml_response(data)
     body = s.BurnResultBody.parse_raw(burn_result.body)
-
     begin_timezone = s.BurnTimestamps.parse_obj(data.timeStamps).beginTimeZone
-
     burn_rating = 100 if body.burn_rating > 100 else body.burn_rating
     burn_values = s.BurnResultDB(
         burn_values=[burn_rating, body.gaze_error, body.reaction_time, body.eye_droop],

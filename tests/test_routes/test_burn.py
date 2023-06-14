@@ -7,8 +7,18 @@ import app.schema as s
 from tests.fixture import TestData
 
 
-def test_create_burn_item(client_a: TestClient, db: Database, test_data: TestData):
+def test_create_burn_item(client_a: TestClient, db: Database, monkeypatch):
     burn_items_number_before = db.burn_items.count_documents({})
+
+    def mock_ml_response(data):
+        return s.BurnResult(
+            statusCode=200,
+            headers={"Content-Type": "application/json"},
+            body='{"eye_droop": 0.1, "gaze_error": 0.8, "reaction_time": 513, "burn_rating": 98}',
+        )
+
+    monkeypatch.setattr("app.router.burn.ml_response", mock_ml_response)
+
     # with open("tests/burn_example.json") as f:
     with open("tests/test_burn.json") as f:
         data = json.load(f)
