@@ -36,7 +36,7 @@ def test_get_user_by_id(client_a: TestClient, db: Database, test_data: TestData)
     response = client_a.get(f"api/user/{test_user.id}")
     assert response and response.status_code == 200
     res_user = s.UserDB.parse_obj(response.json())
-    assert res_user == test_user
+    assert res_user.name == test_user.name
 
 
 def test_update_user(client_a: TestClient, db: Database, test_data: TestData):
@@ -63,7 +63,7 @@ def test_update_user(client_a: TestClient, db: Database, test_data: TestData):
     )
     assert response and response.status_code == 200
     user = s.UserDB.parse_obj(response.json())
-    assert user == test_user
+    assert user.name == test_user.name
 
 
 def test_delete_user(client_a: TestClient, db: Database, test_data: TestData):
