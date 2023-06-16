@@ -4,10 +4,35 @@ from pymongo import results
 from bson.objectid import ObjectId
 from app import get_db
 import app.schema as s
+from app.config import Settings, get_settings
 from app.dependency import get_current_user
 from app.logger import log
 
 sleep_router = APIRouter(prefix="/sleep", tags=["SleepDB"])
+
+
+settings: Settings = get_settings()
+
+
+def ml_response(data):
+    ML_URL = (
+        settings.SLEEP_MODEL_URL
+        if settings.ENV_MODE == "production"
+        else settings.SLEEP_MODEL_URL_LOCAL
+    )
+    ml_response = requests.post(
+        ML_URL,
+        # json=data_json,
+        json=data.dict(),
+    )
+
+    try:
+        burn_result = s.BurnResult.parse_raw(ml_response.text)
+    except Exception:
+        log(log.ERROR, "ML connection error: %s", ml_response.text)
+        raise HTTPException(status_code=400, detail="ML model bad request")
+
+    return burn_result
 
 
 @sleep_router.post(

@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     MONGO_PORT: int
     BURN_MODEL_URL: str
     BURN_MODEL_URL_LOCAL: str
+    SLEEP_MODEL_URL: str
+    SLEEP_MODEL_URL_LOCAL: str
 
     class Config:
         env_file = ["project.env", ".env"]

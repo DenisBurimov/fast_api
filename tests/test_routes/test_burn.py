@@ -38,12 +38,7 @@ TEST_BURN_ITEMS = [
             "range": "moderate",
             "time": "2023-06-12T03:58:40+00:00",
         },
-        logBookResponse=[
-            {"activity": "meditation", "value": 20, "timing": 1},
-            {"activity": "ice_bath", "value": 20, "timing": 0},
-            {"activity": "supplements", "value": 200, "timing": 2},
-            {"activity": "cold_shower", "value": 30, "timing": 2},
-        ],
+        logBookResponse=[],
     ),
     s.BurnResult(
         burnResponse={
