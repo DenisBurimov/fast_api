@@ -1,9 +1,13 @@
 import enum
+from datetime import datetime
 from typing import Union
 from pydantic import BaseModel  # , Field
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
+import pytz
+
+tz = pytz.timezone("Europe/Kyiv")
 
 
 class BurnBase(BaseModel):
@@ -125,10 +129,15 @@ class logBookRecord(BaseModel):
 
 
 class BurnResult(BaseModel):
-    # status_code: int = Field(alias="statusCode")
-    # headers: dict
     burnResponse: BurnResponse
-    logBookResponse: list[dict]
+    logBookResponse: list[logBookRecord]
+    created_at: str | None = datetime.now().isoformat()
+
+
+class BurnUpdate(BaseModel):
+    burnResponse: BurnResponse | None
+    logBookResponse: list[logBookRecord] | None
+    created_at: str | None
 
 
 class BurnResultDB(BurnResult):

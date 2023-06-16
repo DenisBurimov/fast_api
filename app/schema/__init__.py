@@ -16,6 +16,7 @@ from .burn import (
     BurnResult,
     BurnResultDB,
     BurnTimestamps,
+    BurnUpdate,
 )
 from .journal import JournalBase, JournalDB, JournalList
 from .delete_message import DeleteMessage

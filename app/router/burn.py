@@ -1,5 +1,5 @@
 # import json
-from datetime import datetime
+# from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 import requests
 from pymongo.database import Database
@@ -39,7 +39,7 @@ def ml_response(data):
 
 
 @burn_router.post(
-    "/add", status_code=status.HTTP_201_CREATED, response_model=s.BurnResultDB
+    "/add", status_code=status.HTTP_201_CREATED, response_model=s.BurnResult
 )
 def add_burn_item(
     data: s.BurnBase,
@@ -60,25 +60,9 @@ def add_burn_item(
     # data_json = dict(body=json.dumps(data.dict()))
 
     burn_result = ml_response(data)
-    # body = s.BurnResult.parse_raw(burn_result.body)
-    # begin_timezone = s.BurnTimestamps.parse_obj(data.timeStamps).beginTimeZone
-    # burn_rating = 100 if body.burn_rating > 100 else body.burn_rating
-    # burn_values = s.BurnResultDB(
-    #     burn_values=[burn_rating, body.gaze_error, body.reaction_time, body.eye_droop],
-    #     created_at=begin_timezone,
-    # )
-
-    # res: results.InsertOneResult = db.burn_items.insert_one(burn_result.dict())
-    res: results.InsertOneResult = db.burn_items.insert_one(
-        {
-            "burnResponse": burn_result.burnResponse.dict(),
-            "logBookResponse": burn_result.logBookResponse,
-            "created_at": datetime.now().isoformat(),
-        }
-    )
-
+    res: results.InsertOneResult = db.burn_items.insert_one(burn_result.dict())
     log(log.INFO, "Burn item [%s] has been saved", res.inserted_id)
-    return s.BurnResultDB.parse_obj(db.burn_items.find_one({"_id": res.inserted_id}))
+    return s.BurnResult.parse_obj(db.burn_items.find_one({"_id": res.inserted_id}))
 
 
 @burn_router.get("/all", response_model=s.BurnList)
@@ -135,16 +119,30 @@ def get_burn_item_by_date(
     return s.BurnList(burn_items=[s.BurnResultDB.parse_obj(o) for o in burns_by_day])
 
 
-# @burn_router.put("/{id}", response_model=s.UserOut)
-# def update_burn_item(
-#     id: str,
-#     data: s.BurnUpdate,
-#     db: Database = Depends(get_db),
-#     _: s.UserDB = Depends(get_current_user),
-# ):
-#     db.burn_items.update_one(
-#         {"_id": ObjectId(id)},
-#         {"$set": data.dict(exclude_none=True)},
-#     )
+@burn_router.get("/last/{items_number}", response_model=s.BurnList)
+def get_burn_X_items(
+    items_number: int,
+    db: Database = Depends(get_db),
+    _: s.UserDB = Depends(get_current_user),
+):
+    last_items = list(db.burn_items.find().sort("created_at", -1).limit(items_number))
 
-#     return s.BurnResultDB.parse_obj(db.burn_items.find_one({"_id": ObjectId(id)}))
+    if not last_items:
+        return s.BurnList(burn_items=[o for o in last_items])
+
+    return s.BurnList(burn_items=[s.BurnResultDB.parse_obj(o) for o in last_items])
+
+
+@burn_router.put("/update/{id}", response_model=s.BurnResultDB)
+def update_burn_item(
+    id: str,
+    data: s.BurnUpdate,
+    db: Database = Depends(get_db),
+    _: s.UserDB = Depends(get_current_user),
+):
+    db.burn_items.update_one(
+        {"_id": ObjectId(id)},
+        {"$set": data.dict(exclude_none=True)},
+    )
+
+    return s.BurnResultDB.parse_obj(db.burn_items.find_one({"_id": ObjectId(id)}))

@@ -1,12 +1,14 @@
 from datetime import datetime
 import json
-import pytz
 from fastapi.testclient import TestClient
 from pymongo.database import Database
 import app.schema as s
 from tests.fixture import TestData
 
 """
+The burn json input version 2023-06-15
+-----
+
 {"_id":{"$oid":"640a17f89d770e182aced59a"},
 "burnResponse": {
 "burn": x,
@@ -26,29 +28,98 @@ from tests.fixture import TestData
 }
 """
 
+TEST_BURN_ITEMS = [
+    s.BurnResult(
+        burnResponse={
+            "burn": 0.1,
+            "reaction_time": 0.2,
+            "gaze_uniformity": 0.3,
+            "peak_velocity": 0.4,
+            "range": "moderate",
+            "time": "2023-06-12T03:58:40+00:00",
+        },
+        logBookResponse=[
+            {"activity": "meditation", "value": 20, "timing": 1},
+            {"activity": "ice_bath", "value": 20, "timing": 0},
+            {"activity": "supplements", "value": 200, "timing": 2},
+            {"activity": "cold_shower", "value": 30, "timing": 2},
+        ],
+    ),
+    s.BurnResult(
+        burnResponse={
+            "burn": 0.21,
+            "reaction_time": 0.22,
+            "gaze_uniformity": 0.23,
+            "peak_velocity": 0.24,
+            "range": "high",
+            "time": "2023-07-14T07:07:40+07:00",
+        },
+        logBookResponse=[
+            {"activity": "meditation", "value": 30, "timing": 1},
+            {"activity": "ice_bath", "value": 30, "timing": 0},
+            {"activity": "supplements", "value": 400, "timing": 2},
+            {"activity": "cold_shower", "value": 20, "timing": 2},
+        ],
+    ),
+    s.BurnResult(
+        burnResponse={
+            "burn": 0.31,
+            "reaction_time": 0.32,
+            "gaze_uniformity": 0.33,
+            "peak_velocity": 0.34,
+            "range": "high",
+            "time": "2023-05-05T05:05:05+01:00",
+        },
+        logBookResponse=[
+            {"activity": "meditation", "value": 50, "timing": 1},
+            {"activity": "ice_bath", "value": 50, "timing": 0},
+            {"activity": "supplements", "value": 500, "timing": 2},
+            {"activity": "cold_shower", "value": 50, "timing": 2},
+        ],
+        created_at="2023-05-05T05:05:05+01:00",
+    ),
+    s.BurnResult(
+        burnResponse={
+            "burn": 0.31,
+            "reaction_time": 0.32,
+            "gaze_uniformity": 0.33,
+            "peak_velocity": 0.34,
+            "range": "high",
+            "time": "2023-07-14T07:07:07+07:00",
+        },
+        logBookResponse=[
+            {"activity": "meditation", "value": 50, "timing": 1},
+            {"activity": "ice_bath", "value": 50, "timing": 0},
+            {"activity": "supplements", "value": 500, "timing": 2},
+            {"activity": "cold_shower", "value": 50, "timing": 2},
+        ],
+        created_at="2023-07-14T07:07:07+07:00",
+    ),
+    s.BurnResult(
+        burnResponse={
+            "burn": 0.31,
+            "reaction_time": 0.32,
+            "gaze_uniformity": 0.33,
+            "peak_velocity": 0.34,
+            "range": "high",
+            "time": "2023-12-23T12:12:12+05:00",
+        },
+        logBookResponse=[
+            {"activity": "meditation", "value": 50, "timing": 1},
+            {"activity": "ice_bath", "value": 50, "timing": 0},
+            {"activity": "supplements", "value": 500, "timing": 2},
+            {"activity": "cold_shower", "value": 50, "timing": 2},
+        ],
+        created_at="2023-12-23T12:12:12+05:00",
+    ),
+]
+
 
 def test_create_burn_item_with_logbook(client_a: TestClient, db: Database, monkeypatch):
     burn_items_number_before = db.burn_items.count_documents({})
 
     def mock_ml_response(data):
-        return s.BurnResult(
-            # statusCode=200,
-            # headers={"Content-Type": "application/json"},
-            burnResponse={
-                "burn": 0.1,
-                "reaction_time": 0.2,
-                "gaze_uniformity": 0.3,
-                "peak_velocity": 0.4,
-                "range": "moderate",
-                "time": "2023-06-12T03:58:40+00:00",
-            },
-            logBookResponse=[
-                {"activity": "meditation", "value": 20, "timing": 1},
-                {"activity": "ice_bath", "value": 20, "timing": 0},
-                {"activity": "supplements", "value": 200, "timing": 2},
-                {"activity": "cold_shower", "value": 30, "timing": 2},
-            ],
-        )
+        return TEST_BURN_ITEMS[0]
 
     monkeypatch.setattr("app.router.burn.ml_response", mock_ml_response)
 
@@ -66,28 +137,16 @@ def test_create_burn_item_with_logbook(client_a: TestClient, db: Database, monke
 
 
 def test_get_all_burn_items(client_a: TestClient, db: Database, test_data: TestData):
-    db.burn_items.insert_many(
-        [
-            {"burn_values": [33, 0, 333, 0], "created_at": "2023-05-05T05:05:05+01:00"},
-            {"burn_values": [55, 0, 555, 0], "created_at": "2023-07-14T07:07:07+07:00"},
-            {"burn_values": [77, 0, 777, 0], "created_at": "2023-12-23T12:12:12+05:00"},
-        ]
-    )
+    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
     response = client_a.get("api/burn/all")
     assert response.status_code == 200
     burn_items_list = s.BurnList.parse_obj(response.json())
     assert burn_items_list
-    assert len(burn_items_list.burn_items) == 3
+    assert len(burn_items_list.burn_items) == len(TEST_BURN_ITEMS)
 
 
 def test_get_burn_item_by_id(client_a: TestClient, db: Database, test_data: TestData):
-    db.burn_items.insert_many(
-        [
-            {"burn_values": [33, 0, 333, 0], "created_at": "2023-05-05T05:05:05+01:00"},
-            {"burn_values": [55, 0, 555, 0], "created_at": "2023-07-14T07:07:07+07:00"},
-            {"burn_values": [77, 0, 777, 0], "created_at": "2023-12-23T12:12:12+05:00"},
-        ]
-    )
+    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
     item_to_get_id = db.burn_items.find_one().get("_id")
     response = client_a.get(f"api/burn/id/{str(item_to_get_id)}")
     assert response.status_code == 200
@@ -98,64 +157,44 @@ def test_get_burn_item_by_id(client_a: TestClient, db: Database, test_data: Test
 
 
 def test_get_burn_item_by_time(client_a: TestClient, db: Database, test_data: TestData):
-    tz = pytz.timezone("Europe/Kyiv")
-    just_now = datetime.now(tz).isoformat()
-    db.burn_items.insert_many(
-        [
-            {"burn_values": [33, 0, 333, 0], "created_at": "2023-05-05T05:05:05+01:00"},
-            {"burn_values": [55, 0, 555, 0], "created_at": "2023-07-14T07:07:07+07:00"},
-            {"burn_values": [77, 0, 777, 0], "created_at": "2023-12-23T12:12:12+05:00"},
-            {"burn_values": [77, 0, 777, 0], "created_at": "2023-12-23T12:12:12+05:00"},
-            {"burn_values": [33, 0, 333, 0], "created_at": just_now},
-        ]
-    )
+    exact_time = TEST_BURN_ITEMS[0].created_at
+    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
 
-    response = client_a.get(f"api/burn/time/{just_now}")
+    response = client_a.get(f"api/burn/time/{exact_time}")
     assert response.status_code == 200
-    assert s.BurnResultDB.parse_obj(response.json()).created_at == just_now
+    assert s.BurnResultDB.parse_obj(response.json()).created_at == exact_time
 
 
 def test_get_burn_item_by_date(client_a: TestClient, db: Database, test_data: TestData):
-    tz = pytz.timezone("Europe/Kyiv")
     today = datetime.today().isoformat()
-    db.burn_items.insert_many(
-        [
-            {"burn_values": [33, 0, 333, 0], "created_at": "2023-05-05T05:05:05+01:00"},
-            {"burn_values": [55, 0, 555, 0], "created_at": "2023-07-14T07:07:07+07:00"},
-            {"burn_values": [77, 0, 777, 0], "created_at": "2023-12-23T12:12:12+05:00"},
-            {"burn_values": [77, 0, 777, 0], "created_at": "2023-12-23T12:12:12+05:00"},
-            {
-                "burn_values": [11, 0, 111, 0],
-                "created_at": datetime.now(tz).isoformat(),
-            },
-            {
-                "burn_values": [22, 0, 222, 0],
-                "created_at": datetime.now(tz).isoformat(),
-            },
-            {
-                "burn_values": [34, 0, 43, 0],
-                "created_at": datetime.now(tz).isoformat(),
-            },
-        ]
-    )
+    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
 
     response = client_a.get(f"api/burn/date/{today}")
     assert response.status_code == 200
-    assert len(s.BurnList.parse_obj(response.json()).burn_items) == 3
+    assert len(s.BurnList.parse_obj(response.json()).burn_items) == 2
 
 
-# def test_update_burn_item(client_a: TestClient, db: Database, test_data: TestData):
-#     db.burn_items.insert_many(
-#         [
-#             {"burn_values": [33, 0, 333, 0], "created_at": "2023-05-05T05:05:05+01:00"},
-#             {"burn_values": [55, 0, 555, 0], "created_at": "2023-07-14T07:07:07+07:00"},
-#             {"burn_values": [77, 0, 777, 0], "created_at": "2023-12-23T12:12:12+05:00"},
-#         ]
-#     )
-#     item_to_update = db.burn_items.find_one().get("_id")
-#     response = client_a.get(f"api/burn/id/{str(item_to_get_id)}")
-#     assert response.status_code == 200
-#     assert (
-#         list(db.burn_items.find({"_id": item_to_get_id}))[0].get("_id")
-#         == item_to_get_id
-#     )
+def test_get_X_burn_items(client_a: TestClient, db: Database, test_data: TestData):
+    TEST_ITEMS_NUMBER = 3
+    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
+
+    response = client_a.get(f"api/burn/last/{TEST_ITEMS_NUMBER}")
+    assert response.status_code == 200
+    assert len(s.BurnList.parse_obj(response.json()).burn_items) == TEST_ITEMS_NUMBER
+
+
+def test_update_burn_item(client_a: TestClient, db: Database, test_data: TestData):
+    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
+    item_to_update = db.burn_items.find_one().get("_id")
+    logBookResponse = [
+        {"activity": "meditation", "value": 50, "timing": 5},
+        {"activity": "ice_bath", "value": 50, "timing": 5},
+        {"activity": "supplements", "value": 500, "timing": 5},
+        {"activity": "cold_shower", "value": 50, "timing": 5},
+    ]
+    response = client_a.put(
+        f"api/burn/update/{str(item_to_update)}",
+        json=s.BurnUpdate(logBookResponse=logBookResponse).dict(),
+    )
+    assert response.status_code == 200
+    assert s.BurnResultDB.parse_obj(response.json()).logBookResponse == logBookResponse
