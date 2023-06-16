@@ -14,7 +14,6 @@ from .burn import (
     BurnDB,
     BurnList,
     BurnResult,
-    BurnResultBody,
     BurnResultDB,
     BurnTimestamps,
 )

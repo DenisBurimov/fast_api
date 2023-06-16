@@ -33,7 +33,7 @@ def get_user_by_id(
 
 
 @user_router.put("/{id}", response_model=s.UserOut)
-def get_update_user(
+def update_user(
     id: str,
     data: s.UserUpdate,
     db: Database = Depends(get_db),

@@ -5,7 +5,6 @@ from tests.fixture import TestData
 
 
 def test_auth(client: TestClient, db: Database, test_data: TestData):
-    # login by username and password
     response = client.post(
         "api/auth/login",
         data=s.UserLogin(
@@ -14,6 +13,16 @@ def test_auth(client: TestClient, db: Database, test_data: TestData):
         ).dict(),
     )
     assert response and response.status_code == 200, "unexpected response"
+
+
+def test_url_creds(client: TestClient, db: Database, test_data: TestData):
+    """
+    Test to check if login endpoint accepts usermane and password in url instead of data
+    """
+    response = client.post(
+        f"api/auth/login?username={test_data.test_users[0].name}&password={test_data.test_users[0].password}",
+    )
+    assert response.status_code == 422
 
 
 def test_signup(client: TestClient, db: Database, test_data: TestData):

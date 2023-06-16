@@ -1,5 +1,6 @@
+import enum
 from typing import Union
-from pydantic import BaseModel, Field
+from pydantic import BaseModel  # , Field
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
@@ -86,21 +87,51 @@ class BurnDB(DbObject, BurnBase):
         json_encoders = {ObjectId: lambda v: str(v)}
 
 
-class BurnResultBody(BaseModel):
-    burn_rating: int
-    gaze_error: int
-    reaction_time: int
-    eye_droop: int
+class BurnResponseRange(str, enum.Enum):
+    # enum suite for range ['low', 'moderate', 'high', 'burnout']
+    low = "low"
+    moderate = "moderate"
+    high = "high"
+    burnout = "burnout"
+
+
+class BurnResponse(BaseModel):
+    burn: float
+    reaction_time: float
+    gaze_uniformity: float
+    peak_velocity: float
+    range: BurnResponseRange
+    time: str
+
+
+class Activity(str, enum.Enum):
+    meditation = "meditation"
+    ice_bath = "ice_bath"
+    supplements = "supplements"
+    cold_shower = "cold_shower"
+
+
+class logBookRecord(BaseModel):
+    """
+    {"activity": "meditation", "value": 20, "timing": 1},
+    {"activity": "ice_bath", "value": 20, "timing": 0},
+    {"activity": "supplements", "value": 200, "timing": 2},
+    {"activity": "cold_shower", "timing": 2}
+    """
+
+    activity: Activity
+    value: int
+    timing: int
 
 
 class BurnResult(BaseModel):
-    status_code: int = Field(alias="statusCode")
-    headers: dict
-    body: str
+    # status_code: int = Field(alias="statusCode")
+    # headers: dict
+    burnResponse: BurnResponse
+    logBookResponse: list[dict]
 
 
-class BurnResultDB(BaseModel):
-    burn_values: list[int]
+class BurnResultDB(BurnResult):
     created_at: str
 
 
