@@ -1,3 +1,4 @@
+import requests
 from fastapi import APIRouter, Depends, HTTPException, status
 from pymongo.database import Database
 from pymongo import results
@@ -27,12 +28,12 @@ def ml_response(data):
     )
 
     try:
-        burn_result = s.BurnResult.parse_raw(ml_response.text)
+        sleep_result = s.BurnResult.parse_raw(ml_response.text)
     except Exception:
         log(log.ERROR, "ML connection error: %s", ml_response.text)
         raise HTTPException(status_code=400, detail="ML model bad request")
 
-    return burn_result
+    return sleep_result
 
 
 @sleep_router.post(
