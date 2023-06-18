@@ -1,12 +1,22 @@
 import enum
-from pydantic import BaseModel, Field
+from datetime import datetime
+from pydantic import BaseModel  # , Field
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
 
 
+class SleepSampleValue(enum.Enum):
+    inBed = 0
+    asleepUnspecified = 1
+    awake = 2
+    asleepCore = 3
+    asleepDeep = 4
+    asleepREM = 5
+
+
 class SleepSampleItem(BaseModel):
-    value: int
+    value: SleepSampleValue
     startDate: str
     endDate: str
     source: str
@@ -19,26 +29,17 @@ class AccelerometerSampleItem(BaseModel):
     timestamp: str
 
 
-class SleepSampleValue(enum.Enum):
-    inBed = 0
-    asleepUnspecified = 1
-    awake = 2
-    asleepCore = 3
-    asleepDeep = 4
-    asleepREM = 5
-
-
 class StepsSampleItem(BaseModel):
-    value: SleepSampleValue
+    value: int
     startDate: str
     endDate: str
 
 
 class DataFromIOS(BaseModel):
     # sleep_sample: list[SleepSampleItem] = Field(alias="StepsSample")
-    StepsSample: list = Field(alias="StepsSample")
-    accelerometer_sample: list = Field(alias="AccelerometerSample")
-    steps_sample: list = Field(alias="StepsSample")
+    StepsSample: list[SleepSampleItem]
+    AccelerometerSample: list[AccelerometerSampleItem]
+    StepsSample: list[StepsSampleItem]
 
 
 class SleepBody(BaseModel):
@@ -117,3 +118,29 @@ class SleepList(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: lambda v: str(v)}
+
+
+"""
+{"_id":{"$oid":"640a17f89d770e182aced59a"},
+"sleepLastNight": int, // sleep duration
+"sleepTimeline": [{"start": str, "end": str},
+                    {"start": str, "end": str},
+                    {"start": str, "end": str},
+                    {"start": str, "end": str}]
+"focusTimeline": [{"start": str, "end": str, "level": 0},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2}]
+"createdAt":{"$date":{"$numberLong":"1678383096251"}},
+"__v":{"$numberInt":"0"}}
+"""
+
+
+class SleepResult(BaseModel):
+    sleepLastNight: int
+    sleepTimeline: list
+    focusTimeline: list
+    createdAt: str | None = datetime.now().isoformat()

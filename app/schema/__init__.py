@@ -8,7 +8,7 @@ from .user import (
     UserDbWithPasswd,
     UserOut,
 )
-from .sleep import SleepBase, SleepDB, SleepList
+from .sleep import SleepBase, SleepDB, SleepList, SleepResult
 from .burn import (
     BurnBase,
     BurnDB,

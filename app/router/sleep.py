@@ -28,7 +28,7 @@ def ml_response(data):
     )
 
     try:
-        sleep_result = s.BurnResult.parse_raw(ml_response.text)
+        sleep_result = s.SleepResult.parse_raw(ml_response.text)
     except Exception:
         log(log.ERROR, "ML connection error: %s", ml_response.text)
         raise HTTPException(status_code=400, detail="ML model bad request")
@@ -37,17 +37,18 @@ def ml_response(data):
 
 
 @sleep_router.post(
-    "/add", status_code=status.HTTP_201_CREATED, response_model=s.SleepDB
+    "/add", status_code=status.HTTP_201_CREATED, response_model=s.SleepResult
 )
 def add_sleep_item(
     data: s.SleepBase,
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
-    res: results.InsertOneResult = db.sleep_items.insert_one(data.dict())
+    sleep_result = ml_response(data)
+    res: results.InsertOneResult = db.sleep_items.insert_one(sleep_result.dict())
 
     log(log.INFO, "Sleep item [%s] has been saved", res.inserted_id)
-    return s.SleepDB.parse_obj(db.sleep_items.find_one({"_id": res.inserted_id}))
+    return s.SleepResult.parse_obj(db.sleep_items.find_one({"_id": res.inserted_id}))
 
 
 @sleep_router.get("/all", response_model=s.SleepList)
