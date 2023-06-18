@@ -1,3 +1,4 @@
+import json
 from fastapi.testclient import TestClient
 from pymongo.database import Database
 import app.schema as s
@@ -5,9 +6,12 @@ from tests.fixture import TestData
 
 
 def test_create_sleep_item(client_a: TestClient, db: Database, test_data: TestData):
+    with open("tests/test_sleep.json") as f:
+        data = json.load(f)
     response = client_a.post(
         "api/sleep/add",
-        json=test_data.test_sleep_items[0].dict(),
+        # json=test_data.test_sleep_items[0].dict(),
+        json=data,
     )
     assert response.status_code == 201
 

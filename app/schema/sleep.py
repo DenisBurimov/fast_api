@@ -1,129 +1,104 @@
 import enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
 
 
-class RecordsType(str, enum.Enum):
-    DiagnosticRecord = "diagnostics"
-    SleepRecord = "sleep"
-    AccelerometerRecord = "accelerometer"
-    StepRecord = "step"
-    PedometerRecord = "pedometer"
-
-
-class DataBase(BaseModel):
-    pass
-
-
-class DiagnosticRecord(DataBase):
-    date: str
-    message: str
-    data: dict
-
-
-class SleepRecord(DataBase):
+class SleepSampleItem(BaseModel):
     value: int
     startDate: str
     endDate: str
     source: str
 
 
-class AccelerometerRecord(DataBase):
-    date: str
+class AccelerometerSampleItem(BaseModel):
     x: float
     y: float
     z: float
+    timestamp: str
 
 
-class StepRecord(DataBase):
-    date: str
-    unknown: int
-    stationary: int
-    walking: int
-    running: int
-    automotive: int
-    cycling: int
+class SleepSampleValue(enum.Enum):
+    inBed = 0
+    asleepUnspecified = 1
+    awake = 2
+    asleepCore = 3
+    asleepDeep = 4
+    asleepREM = 5
 
 
-class PedometerRecord(DataBase):
+class StepsSampleItem(BaseModel):
+    value: SleepSampleValue
     startDate: str
     endDate: str
-    numberOfSteps: int
-    distance: float
-    floorsAscended: int
-    floorsDescended: int
-    currentPace: float
-    currentCadence: float
-    averageActivePace: float
 
 
-class DataItem(BaseModel):
-    data: DiagnosticRecord | SleepRecord | AccelerometerRecord | StepRecord | PedometerRecord
-    type: RecordsType
+class DataFromIOS(BaseModel):
+    # sleep_sample: list[SleepSampleItem] = Field(alias="StepsSample")
+    StepsSample: list = Field(alias="StepsSample")
+    accelerometer_sample: list = Field(alias="AccelerometerSample")
+    steps_sample: list = Field(alias="StepsSample")
+
+
+class SleepBody(BaseModel):
+    dataFromIOS: DataFromIOS
+    dataFromDatabase: dict
 
 
 class SleepBase(BaseModel):
-    dataItems: list[DataItem]
+    body: SleepBody
 
     class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
         schema_extra = {
             "example": {
-                "dataItems": [
-                    {
-                        "data": {
-                            "date": "2023-01-31 03:00:00+00:00",
-                            "message": "Diagnostics message",
-                            "data": {},
-                        },
-                        "type": "diagnostics",
+                "body": {
+                    "dataFromIOS": {
+                        "SleepSample": [
+                            {
+                                "value": 6,
+                                "startDate": "2023-06-12T11:11:11-04:00",
+                                "endDate": "2023-06-12T11:11:11-04:00",
+                                "source": "str",
+                            },
+                            {
+                                "value": 1,
+                                "startDate": "2023-06-13T12:41:15-04:00",
+                                "endDate": "2023-06-13T12:41:15-04:00",
+                                "source": "WHOOP",
+                            },
+                        ],
+                        "AccelerometerSample": [
+                            {
+                                "x": 0.1,
+                                "y": 0.2,
+                                "z": 0.3,
+                                "timestamp": "2023-06-13T12:41:15-04:00",
+                            },
+                            {
+                                "x": -0.019287109375,
+                                "y": -0.0205078125,
+                                "z": -0.996826171875,
+                                "timestamp": "2023-06-14T12:12:12-04:00",
+                            },
+                        ],
+                        "StepsSample": [
+                            {
+                                "value": 5,
+                                "startDate": "2023-06-15T10:10:10-04:00",
+                                "endDate": "2023-06-15T12:12:12-04:00",
+                            },
+                            {
+                                "value": 18,
+                                "startDate": "2023-06-13T12:41:15-04:00",
+                                "endDate": "2023-06-13T12:41:15-04:00",
+                            },
+                        ],
                     },
-                    {
-                        "data": {
-                            "value": 0,
-                            "startDate": "2023-01-31 03:00:00+00:00",
-                            "endDate": "2023-01-31 13:00:00+00:00",
-                            "source": "Apple Watch",
-                        },
-                        "type": "sleep",
-                    },
-                    {
-                        "data": {
-                            "date": "2023-01-31 03:00:00+00:00",
-                            "x": -0.019287109375,
-                            "y": -0.0205078125,
-                            "z": -0.996826171875,
-                        },
-                        "type": "accelerometer",
-                    },
-                    {
-                        "data": {
-                            "date": "2023-01-31 03:00:00+00:00",
-                            "unknown": 0,
-                            "stationary": 0,
-                            "walking": 1,
-                            "running": 0,
-                            "automotive": 0,
-                            "cycling": 0,
-                        },
-                        "type": "step",
-                    },
-                    {
-                        "data": {
-                            "startDate": "2023-01-31 03:00:00+00:00",
-                            "endDate": "2023-01-31 04:00:00+00:00",
-                            "numberOfSteps": 6500,
-                            "distance": 10.5,
-                            "floorsAscended": 20,
-                            "floorsDescended": 20,
-                            "currentPace": 0.5,
-                            "currentCadence": 1.5,
-                            "averageActivePace": 0.8,
-                        },
-                        "type": "pedometer",
-                    },
-                ]
+                    "dataFromDatabase": {},
+                }
             }
         }
 
