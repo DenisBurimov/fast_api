@@ -1,13 +1,17 @@
+import json
 from fastapi.testclient import TestClient
 from pymongo.database import Database
 import app.schema as s
 from tests.fixture import TestData
 
+with open("tests/test_logbook.json") as f:
+    data = json.load(f)
+
 
 def test_create_journal_item(client_a: TestClient, db: Database, test_data: TestData):
     response = client_a.post(
         "api/journal/add",
-        json=test_data.test_journal_items[0].dict(),
+        json=data[0],
     )
     assert response.status_code == 201
 
@@ -17,7 +21,7 @@ def test_get_all_journal_items(client_a: TestClient, db: Database, test_data: Te
     assert response.status_code == 200
     journal_items_list = s.JournalList.parse_obj(response.json())
     assert journal_items_list
-    assert len(journal_items_list.journal_items) == len(test_data.test_journal_items)
+    assert len(journal_items_list.journal_items) == len(data)
 
 
 def test_get_journal_item_by_id(

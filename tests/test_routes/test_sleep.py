@@ -4,9 +4,6 @@ from pymongo.database import Database
 import app.schema as s
 
 
-with open("tests/test_sleep.json") as f:
-    data = json.load(f)
-
 """
 {"_id":{"$oid":"640a17f89d770e182aced59a"},
 "sleepLastNight": int, // sleep duration
@@ -24,6 +21,9 @@ with open("tests/test_sleep.json") as f:
 "createdAt":{"$date":{"$numberLong":"1678383096251"}},
 "__v":{"$numberInt":"0"}}
 """
+
+with open("tests/test_sleep.json") as f:
+    data = json.load(f)
 
 
 def test_create_sleep_item(client_a: TestClient, db: Database, monkeypatch):

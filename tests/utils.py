@@ -22,3 +22,9 @@ def fill_db_by_test_data(db: Database, test_data: TestData):
 
         for sleep_item in sleep_data:
             db.sleep_items.insert_one(sleep_item)
+
+    with open("tests/test_logbook.json") as f:
+        logbook_data = json.load(f)
+        for data_item in logbook_data:
+            logbook_item = s.JournalBase.parse_obj(data_item)
+            db.journal_items.insert_one(logbook_item.dict())

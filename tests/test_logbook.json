@@ -1,0 +1,68 @@
+[
+    {
+        "activities": [
+            {
+                "activity": "meditation",
+                "value": 20,
+                "timing": 1
+            },
+            {
+                "activity": "ice_bath",
+                "value": 20,
+                "timing": 0
+            },
+            {
+                "activity": "cold_shower",
+                "value": 20,
+                "timing": 2
+            }
+        ],
+        "__v": {
+            "$numberInt": "0"
+        }
+    },
+    {
+        "activities": [
+            {
+                "activity": "meditation",
+                "value": 20,
+                "timing": 1
+            },
+            {
+                "activity": "ice_bath",
+                "value": 20,
+                "timing": 0
+            },
+            {
+                "activity": "cold_shower",
+                "value": 20,
+                "timing": 2
+            }
+        ],
+        "__v": {
+            "$numberInt": "0"
+        }
+    },
+    {
+        "activities": [
+            {
+                "activity": "meditation",
+                "value": 20,
+                "timing": 1
+            },
+            {
+                "activity": "ice_bath",
+                "value": 20,
+                "timing": 0
+            },
+            {
+                "activity": "cold_shower",
+                "value": 20,
+                "timing": 2
+            }
+        ],
+        "__v": {
+            "$numberInt": "0"
+        }
+    }
+]

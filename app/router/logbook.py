@@ -7,10 +7,10 @@ import app.schema as s
 from app.dependency import get_current_user
 from app.logger import log
 
-journal_router = APIRouter(prefix="/journal", tags=["JournalDB"])
+logbook_router = APIRouter(prefix="/journal", tags=["JournalDB"])
 
 
-@journal_router.post(
+@logbook_router.post(
     "/add", status_code=status.HTTP_201_CREATED, response_model=s.JournalDB
 )
 def add_journal_item(
@@ -24,7 +24,7 @@ def add_journal_item(
     return s.JournalDB.parse_obj(db.journal_items.find_one({"_id": res.inserted_id}))
 
 
-@journal_router.get("/all", response_model=s.JournalList)
+@logbook_router.get("/all", response_model=s.JournalList)
 def get_journal_items(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
@@ -34,7 +34,7 @@ def get_journal_items(
     )
 
 
-@journal_router.get("/{id}", response_model=s.JournalDB)
+@logbook_router.get("/{id}", response_model=s.JournalDB)
 def get_journal_item_by_id(
     id: str,
     db: Database = Depends(get_db),
@@ -47,7 +47,7 @@ def get_journal_item_by_id(
     return s.JournalDB.parse_obj(journal_item)
 
 
-@journal_router.delete("/{id}", response_model=s.DeleteMessage)
+@logbook_router.delete("/{id}", response_model=s.DeleteMessage)
 def get_delete_user(
     id: str,
     db: Database = Depends(get_db),

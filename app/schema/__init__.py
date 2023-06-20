@@ -18,6 +18,6 @@ from .burn import (
     BurnTimestamps,
     BurnUpdate,
 )
-from .journal import JournalBase, JournalDB, JournalList
+from .logbook import JournalBase, JournalDB, JournalList
 from .delete_message import DeleteMessage
 from .token import Token, TokenData
