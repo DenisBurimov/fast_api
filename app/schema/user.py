@@ -36,6 +36,7 @@ class UserOut(BaseModel):
     name: str
     activities: list[UserActivities]
     goals: list[UsersGoals]
+    v: int | None
 
 
 class UserCreate(UserBase):
@@ -56,9 +57,12 @@ class UserUpdate(BaseModel):
     password: str | None
     activities: list[UserActivities] | None
     goals: list[UsersGoals] | None
+    v: int | None
 
 
 class UserDB(DbObject, UserBase):
+    v: int | None = 0
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True

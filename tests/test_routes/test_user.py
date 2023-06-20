@@ -61,6 +61,7 @@ def test_update_user(client_a: TestClient, db: Database, test_data: TestData):
     )
     assert response and response.status_code == 200
     user = s.UserDB.parse_obj(response.json())
+    assert user.v == 1
     assert user != test_user
 
     response = client_a.put(
@@ -72,6 +73,7 @@ def test_update_user(client_a: TestClient, db: Database, test_data: TestData):
     )
     assert response and response.status_code == 200
     user = s.UserDB.parse_obj(response.json())
+    assert user.v == 2
     assert user.name == test_user.name
 
 

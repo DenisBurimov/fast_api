@@ -39,6 +39,14 @@ def update_user(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
+    user = db.users.find_one({"_id": ObjectId(id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="This user was not found")
+
+    if not user.get("v"):
+        data.v = 1
+    else:
+        data.v = user["v"] + 1
     db.users.update_one({"_id": ObjectId(id)}, {"$set": data.dict(exclude_none=True)})
 
     return s.UserOut.parse_obj(db.users.find_one({"_id": ObjectId(id)}))
