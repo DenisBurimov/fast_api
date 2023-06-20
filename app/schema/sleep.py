@@ -144,3 +144,4 @@ class SleepResult(BaseModel):
     sleepTimeline: list
     focusTimeline: list
     createdAt: str | None = datetime.now().isoformat()
+    v: int | None = 0
