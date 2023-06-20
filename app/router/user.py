@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.database import Database
 from pymongo import results
@@ -43,10 +44,8 @@ def update_user(
     if not user:
         raise HTTPException(status_code=404, detail="This user was not found")
 
-    if not user.get("v"):
-        data.v = 1
-    else:
-        data.v = user["v"] + 1
+    data.v = 1 if not user.get("v") else user["v"] + 1
+    data.updated_at = datetime.now().isoformat()
     db.users.update_one({"_id": ObjectId(id)}, {"$set": data.dict(exclude_none=True)})
 
     return s.UserOut.parse_obj(db.users.find_one({"_id": ObjectId(id)}))
