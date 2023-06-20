@@ -140,6 +140,11 @@ def update_burn_item(
     db: Database = Depends(get_db),
     _: s.UserDB = Depends(get_current_user),
 ):
+    burn_item = db.burn_items.find_one({"_id": ObjectId(id)})
+    if not burn_item:
+        raise HTTPException(status_code=404, detail="This burn item was not found")
+
+    data.v = 1 if not burn_item.get("v") else burn_item["v"] + 1
     db.burn_items.update_one(
         {"_id": ObjectId(id)},
         {"$set": data.dict(exclude_none=True)},

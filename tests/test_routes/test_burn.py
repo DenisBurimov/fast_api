@@ -193,3 +193,4 @@ def test_update_burn_item(client_a: TestClient, db: Database, test_data: TestDat
     )
     assert response.status_code == 200
     assert s.BurnResultDB.parse_obj(response.json()).logBookResponse == logBookResponse
+    assert s.BurnResultDB.parse_obj(response.json()).v == 1

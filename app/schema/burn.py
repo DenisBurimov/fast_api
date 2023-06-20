@@ -139,6 +139,7 @@ class BurnUpdate(BaseModel):
     burnResponse: BurnResponse | None
     logBookResponse: list[logBookRecord] | None
     created_at: str | None
+    v: int | None
 
 
 class BurnResultDB(BurnResult):
