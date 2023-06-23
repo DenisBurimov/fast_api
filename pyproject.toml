@@ -18,6 +18,8 @@ passlib = "^1.7.4"
 bcrypt = "^4.0.1"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.6"
+requests = "^2.31.0"
+pytz = "^2023.3"
 
 
 [tool.poetry.group.dev.dependencies]

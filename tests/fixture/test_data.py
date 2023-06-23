@@ -15,10 +15,6 @@ class TestData(BaseModel):
     test_authorized_users: list[s.UserCreate]
     test_superuser: s.UserCreate | None
 
-    test_sleep_items: list[s.SleepBase]
-    test_burn_items: list[s.BurnBase]
-    test_journal_items: list[s.JournalBase]
-
 
 @pytest.fixture
 def test_data() -> Generator[TestData, None, None]:

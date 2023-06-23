@@ -1,64 +1,106 @@
+import enum
 from datetime import datetime
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel  # , Field
 from bson.objectid import ObjectId
+
 from .db_object import DbObject
 
 
+class SleepSampleValue(enum.Enum):
+    inBed = 0
+    asleepUnspecified = 1
+    awake = 2
+    asleepCore = 3
+    asleepDeep = 4
+    asleepREM = 5
+
+
+class SleepSampleItem(BaseModel):
+    value: SleepSampleValue
+    startDate: str
+    endDate: str
+    source: str
+
+
+class AccelerometerSampleItem(BaseModel):
+    x: float
+    y: float
+    z: float
+    timestamp: str
+
+
+class StepsSampleItem(BaseModel):
+    value: int
+    startDate: str
+    endDate: str
+
+
+class DataFromIOS(BaseModel):
+    # sleep_sample: list[SleepSampleItem] = Field(alias="StepsSample")
+    StepsSample: list[SleepSampleItem]
+    AccelerometerSample: list[AccelerometerSampleItem]
+    StepsSample: list[StepsSampleItem]
+
+
+class SleepBody(BaseModel):
+    dataFromIOS: DataFromIOS
+    dataFromDatabase: dict
+
+
 class SleepBase(BaseModel):
-    id: str | None = Field(alias="_id")
-    sleep_duration: int
-    sleep_intervals: list[dict]
-    created_at: datetime = Field(alias="createdAt")
-
-    @validator("id", pre=True)
-    def id_from_dict(cls, value: dict):
-        if not isinstance(value, dict):
-            return value
-        return value.get("$oid")
-
-    @validator("sleep_duration", pre=True)
-    def sleep_duration_from_dict(cls, value: dict):
-        if not isinstance(value, dict):
-            return value
-        return value.get("$numberInt")
-
-    @validator("created_at", pre=True)
-    def created_at_from_dict(cls, value: dict) -> datetime:
-        if not isinstance(value, dict):
-            return value
-        if "$date" not in value:
-            raise ValueError("Unexpected date format!")
-        py_timestamp = int(value["$date"]["$numberLong"])
-        return datetime.fromtimestamp(py_timestamp / 1000)
+    body: SleepBody
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         schema_extra = {
             "example": {
-                "_id": {"$oid": "640a17f89d770e182aced59a"},
-                "sleep_duration": {"$numberInt": "389"},
-                "sleep_intervals": [
-                    {"start": "22:37:00", "end": "8:45:00", "level": 0},
-                    {"start": "8:45:00", "end": "10:15:00", "level": 1},
-                    {"start": "10:15:00", "end": "11:50:00", "level": 2},
-                    {"start": "11:50:00", "end": "12:20:00", "level": 1},
-                    {"start": "12:20:00", "end": "13:15:00", "level": 2},
-                    {"start": "13:15:00", "end": "13:45:00", "level": 1},
-                    {"start": "13:45:00", "end": "15:20:00", "level": 2},
-                    {"start": "15:20:00", "end": "15:50:00", "level": 1},
-                    {"start": "15:50:00", "end": "17:25:00", "level": 2},
-                    {"start": "17:25:00", "end": "17:55:00", "level": 1},
-                    {"start": "17:55:00", "end": "19:30:00", "level": 2},
-                    {"start": "19:30:00", "end": "20:00:00", "level": 1},
-                    {"start": "20:00:00", "end": "24:00:00", "level": 0},
-                ],
-                "createdAt": {"$date": {"$numberLong": "1678383096251"}},
-                "__v": {"$numberInt": "0"},
+                "body": {
+                    "dataFromIOS": {
+                        "SleepSample": [
+                            {
+                                "value": 6,
+                                "startDate": "2023-06-12T11:11:11-04:00",
+                                "endDate": "2023-06-12T11:11:11-04:00",
+                                "source": "str",
+                            },
+                            {
+                                "value": 1,
+                                "startDate": "2023-06-13T12:41:15-04:00",
+                                "endDate": "2023-06-13T12:41:15-04:00",
+                                "source": "WHOOP",
+                            },
+                        ],
+                        "AccelerometerSample": [
+                            {
+                                "x": 0.1,
+                                "y": 0.2,
+                                "z": 0.3,
+                                "timestamp": "2023-06-13T12:41:15-04:00",
+                            },
+                            {
+                                "x": -0.019287109375,
+                                "y": -0.0205078125,
+                                "z": -0.996826171875,
+                                "timestamp": "2023-06-14T12:12:12-04:00",
+                            },
+                        ],
+                        "StepsSample": [
+                            {
+                                "value": 5,
+                                "startDate": "2023-06-15T10:10:10-04:00",
+                                "endDate": "2023-06-15T12:12:12-04:00",
+                            },
+                            {
+                                "value": 18,
+                                "startDate": "2023-06-13T12:41:15-04:00",
+                                "endDate": "2023-06-13T12:41:15-04:00",
+                            },
+                        ],
+                    },
+                    "dataFromDatabase": {},
+                }
             }
-        }
-        json_encoders = {
-            datetime: lambda v: {"$date": {"$numberLong": int(v.timestamp() * 1000)}},
         }
 
 
@@ -76,3 +118,30 @@ class SleepList(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: lambda v: str(v)}
+
+
+"""
+{"_id":{"$oid":"640a17f89d770e182aced59a"},
+"sleepLastNight": int, // sleep duration
+"sleepTimeline": [{"start": str, "end": str},
+                    {"start": str, "end": str},
+                    {"start": str, "end": str},
+                    {"start": str, "end": str}]
+"focusTimeline": [{"start": str, "end": str, "level": 0},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2}]
+"createdAt":{"$date":{"$numberLong":"1678383096251"}},
+"__v":{"$numberInt":"0"}}
+"""
+
+
+class SleepResult(BaseModel):
+    sleepLastNight: int
+    sleepTimeline: list
+    focusTimeline: list
+    createdAt: str | None = datetime.now().isoformat()
+    v: int | None = 0

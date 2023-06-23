@@ -12,11 +12,12 @@ MONGO_PORT = settings.MONGO_PORT
 MONGO_INITDB_ROOT_USERNAME = settings.MONGO_INITDB_ROOT_USERNAME
 MONGO_INITDB_ROOT_PASSWORD = settings.MONGO_INITDB_ROOT_PASSWORD
 # mongo = MongoClient(host=["mongo"], username="user", password="pass")
-mongo = MongoClient(
-    host=[MONGO_HOST],
-    username=MONGO_INITDB_ROOT_USERNAME,
-    password=MONGO_INITDB_ROOT_PASSWORD,
-)
+# mongo = MongoClient(
+#     host=[MONGO_HOST],
+#     username=MONGO_INITDB_ROOT_USERNAME,
+#     password=MONGO_INITDB_ROOT_PASSWORD,
+# )
+mongo = MongoClient(settings.MONGO_URI)
 
 
 def get_db() -> Generator[Database, None, None]:

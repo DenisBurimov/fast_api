@@ -1,71 +1,51 @@
+import enum
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
 
 
+class UserActivities(str, enum.Enum):
+    caffeine = "caffeine"
+    meditation = "meditation"
+    supplements = "supplements"
+    alcohol = "alcohol"
+    coldhotTherapy = "coldhotTherapy"
+    marijuana = "marijuana"
+
+
+class UsersGoals(str, enum.Enum):
+    enhancedFocus = "enhancedFocus"
+    betterSleep = "betterSleep"
+    mindfullness = "mindfulness"
+    breakHabits = "breakHabits"
+    removeDistractions = "removeDistractions"
+    marijuana = "marijuana"
+
+
 class UserBase(BaseModel):
-    id: str | None = Field(alias="_id")
     email: EmailStr
     name: str
-    age: int
-    expectations: list
-    gender: int
-    created_at: datetime = Field(alias="createdAt")
-    updated_at: datetime = Field(alias="createdAt")
+    activities: list[UserActivities] | None = []
+    goals: list[UsersGoals] | None = []
+    created_at: str = datetime.now().isoformat()
+    updated_at: str = datetime.now().isoformat()
 
-    @validator("id", pre=True)
-    def id_from_dict(cls, value: dict):
-        if not isinstance(value, dict):
-            return value
-        return value.get("$oid")
 
-    @validator("age", pre=True)
-    def age_from_dict(cls, value: dict):
-        if not isinstance(value, dict):
-            return value
-        return value.get("$numberInt")
-
-    @validator("gender", pre=True)
-    def gender_from_dict(cls, value: dict):
-        if not isinstance(value, dict):
-            return value
-        return value.get("$numberInt")
-
-    @validator("expectations", pre=True)
-    def expectations_from_list(cls, value: list):
-        if not isinstance(value, list) or not isinstance(value[0], dict):
-            return value
-
-        return [value[0].get("$numberInt"), value[1].get("$numberInt")]
-
-    @validator("created_at", pre=True)
-    def created_at_from_dict(cls, value: dict) -> datetime:
-        if not isinstance(value, dict):
-            return value
-        if "$date" not in value:
-            raise ValueError("Unexpected date format!")
-
-        py_timestamp = int(value["$date"]["$numberLong"])
-
-        return datetime.fromtimestamp(py_timestamp / 1000)
-
-    @validator("updated_at", pre=True)
-    def updated_at_from_dict(cls, value: dict) -> datetime:
-        if not isinstance(value, dict):
-            return value
-        if "$date" not in value:
-            raise ValueError("Unexpected date format!")
-
-        py_timestamp = int(value["$date"]["$numberLong"])
-
-        return datetime.fromtimestamp(py_timestamp / 1000)
+class UserOut(BaseModel):
+    email: EmailStr
+    name: str
+    activities: list[UserActivities]
+    goals: list[UsersGoals]
+    v: int | None
+    created_at: str = datetime.now().isoformat()
+    updated_at: str = datetime.now().isoformat()
 
 
 class UserCreate(UserBase):
     password: str
-    password_hash: str = ""
+    password_hash: str | None = ""
 
 
 class UserLogin(BaseModel):
@@ -76,16 +56,18 @@ class UserLogin(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    username: str | None
     email: EmailStr | None
-    password: str | None
     name: str | None
-    age: int | None
-    expectations: list | None
-    gender: int | None
+    password: str | None
+    activities: list[UserActivities] | None
+    goals: list[UsersGoals] | None
+    v: int | None
+    updated_at: str | None = datetime.now().isoformat()
 
 
 class UserDB(DbObject, UserBase):
+    v: int | None = 0
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True

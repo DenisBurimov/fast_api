@@ -1,3 +1,4 @@
+import json
 from pymongo.database import Database
 from app import schema as s, make_hash
 from tests.fixture import TestData
@@ -15,9 +16,15 @@ def fill_db_by_test_data(db: Database, test_data: TestData):
     for u in test_data.test_users:
         u.password_hash = make_hash(u.password)
         db.users.insert_one(u.dict(exclude={"password": True}))
-    for journal_item in test_data.test_journal_items:
-        db.journal_items.insert_one(journal_item.dict())
-    for burn_item in test_data.test_burn_items:
-        db.burn_items.insert_one(burn_item.dict())
-    for sleep_item in test_data.test_sleep_items:
-        db.sleep_items.insert_one(sleep_item.dict())
+
+    with open("tests/test_sleep.json") as sleep_file:
+        sleep_data = json.load(sleep_file)
+
+        for sleep_item in sleep_data:
+            db.sleep_items.insert_one(sleep_item)
+
+    with open("tests/test_logbook.json") as f:
+        logbook_data = json.load(f)
+        for data_item in logbook_data:
+            logbook_item = s.JournalBase.parse_obj(data_item)
+            db.journal_items.insert_one(logbook_item.dict())
