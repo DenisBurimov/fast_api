@@ -73,6 +73,21 @@ def get_sleep_item_by_id(
 
     return s.SleepDB.parse_obj(sleep_item)
 
+@sleep_router.get("/date/{day}", response_model=s.SleepDB)
+def get_sleep_item_by_date(
+    day: str,
+    db: Database = Depends(get_db),
+    _: s.UserDB = Depends(get_current_user),
+):
+    day_str = day.split("T")[0]
+    sleep_by_day = list(
+        db.SleepDB.find({"created_at": {"$regex": f".*{day_str}.*"}})
+    )
+
+    if not sleep_by_day:
+        return s.SleepDB(sleep_item=[o for o in sleep_by_day])
+
+    return s.SleepDB(sleep_item=[s.SleepDB.parse_obj(o) for o in sleep_by_day])
 
 @sleep_router.delete("/{id}", response_model=s.DeleteMessage)
 def get_delete_user(
