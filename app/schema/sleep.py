@@ -130,10 +130,21 @@ class SleepDB(DbObject, SleepBase):
 """
 
 
+class SleepTimeLineItem(BaseModel):
+    start: str
+    end: str
+
+
+class FocusTimeLineItem(BaseModel):
+    start: str
+    end: str
+    level: int
+
+
 class SleepResult(BaseModel):
     sleepLastNight: int
-    sleepTimeline: list
-    focusTimeline: list
+    sleepTimeline: list[SleepTimeLineItem]
+    focusTimeline: list[FocusTimeLineItem]
     createdAt: str | None = datetime.now().isoformat()
     v: int | None = 0
 
