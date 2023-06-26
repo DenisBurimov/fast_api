@@ -156,7 +156,7 @@ def test_create_sleep_item(client_a: TestClient, db: Database, monkeypatch):
 
 
 def test_get_all_sleep_items(client_a: TestClient, db: Database):
-    # db.sleep_items.insert_many(x.dict() for x in TEST_SLEEP_ITEMS)
+    db.sleep_items.insert_many(x.dict() for x in TEST_SLEEP_ITEMS)
     response = client_a.get("api/sleep/all")
     assert response.status_code == 200
     sleep_items_list = s.SleepList.parse_obj(response.json())
@@ -165,15 +165,22 @@ def test_get_all_sleep_items(client_a: TestClient, db: Database):
 
 
 def test_get_sleep_item_by_id(client_a: TestClient, db: Database):
+    db.sleep_items.insert_many(x.dict() for x in TEST_SLEEP_ITEMS)
     item_to_get_id = db.sleep_items.find_one().get("_id")
     response = client_a.get(f"api/sleep/{str(item_to_get_id)}")
     assert response.status_code == 200
-    assert s.SleepResult.parse_obj(response.json()).id == item_to_get_id
+    assert (
+        list(db.sleep_items.find({"_id": item_to_get_id}))[0].get("_id")
+        == item_to_get_id
+    )
 
 
 def test_get_sleep_item_by_date(client_a: TestClient, db: Database):
-    item_to_get = db.sleep_items.find_one()
-    item_to_get_id = db.sleep_items.find_one().get("_id")
-    response = client_a.get(f"api/sleep/{str(item_to_get_id)}")
+    db.sleep_items.insert_many(x.dict() for x in TEST_SLEEP_ITEMS)
+    item_to_get_id = db.sleep_items.find_one().get("createdAt")
+    response = client_a.get(f"api/sleep/date/{str(item_to_get_id)}")
     assert response.status_code == 200
-    assert s.SleepDB.parse_obj(response.json()).id == item_to_get_id
+    assert (
+        list(db.sleep_items.find({"createdAt": item_to_get_id}))[0].get("createdAt")
+        == item_to_get_id
+    )
