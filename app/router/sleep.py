@@ -1,4 +1,5 @@
-import requests
+import json
+import boto3
 from fastapi import APIRouter, Depends, HTTPException, status
 from pymongo.database import Database
 from pymongo import results
@@ -16,21 +17,40 @@ settings: Settings = get_settings()
 
 
 def ml_response(data):
-    ML_URL = (
-        settings.SLEEP_MODEL_URL
-        if settings.ENV_MODE == "production"
-        else settings.SLEEP_MODEL_URL_LOCAL
-    )
-    ml_response = requests.post(
-        ML_URL,
-        # json=data_json,
-        json=data.dict(),
+    # ML_URL = (
+    #     settings.SLEEP_MODEL_URL
+    #     if settings.ENV_MODE == "production"
+    #     else settings.SLEEP_MODEL_URL_LOCAL
+    # )
+    # ml_response = requests.post(
+    #     ML_URL,
+    #     # json=data_json,
+    #     json=data.dict(),
+    # )
+
+    AWS_REGION = "us-east-1"
+    client = boto3.client(
+        "lambda",
+        region_name=AWS_REGION,
+        aws_access_key_id=settings.AWS_ACCESS_KEY,
+        aws_secret_access_key=settings.AWS_SECRET_KEY,
     )
 
+    data = data.dict()
+
+    response = client.invoke(
+        FunctionName="oculo-sleep",
+        Payload=json.dumps(data),
+    )
+    print(response["Payload"])
+    print(response["Payload"].read().decode("utf-8"))
+    log(log.DEBUG, "response payload: %s", response.get("Payload"))
+    log(log.DEBUG, "response payload: %s", response.get("Payload"))
+
     try:
-        sleep_result = s.SleepResult.parse_raw(ml_response.text)
+        sleep_result = s.SleepResult.parse_raw(ml_response.read().decode("utf-8"))
     except Exception:
-        log(log.ERROR, "ML connection error: %s", ml_response.text)
+        log(log.ERROR, "ML connection error: %s", ml_response.read().decode("utf-8"))
         raise HTTPException(status_code=400, detail="ML model bad request")
 
     return sleep_result
