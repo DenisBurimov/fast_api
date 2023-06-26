@@ -57,11 +57,11 @@ def get_sleep_items(
     _: s.UserDB = Depends(get_current_user),
 ):
     return s.SleepList(
-        sleep_items=[s.SleepDB.parse_obj(o) for o in db.sleep_items.find()]
+        sleep_items=[s.SleepResult.parse_obj(o) for o in db.sleep_items.find()]
     )
 
 
-@sleep_router.get("/{id}", response_model=s.SleepDB)
+@sleep_router.get("/{id}", response_model=s.SleepResult)
 def get_sleep_item_by_id(
     id: str,
     db: Database = Depends(get_db),
@@ -71,7 +71,8 @@ def get_sleep_item_by_id(
     if not sleep_item:
         raise HTTPException(status_code=404, detail="This sleep item was not found")
 
-    return s.SleepDB.parse_obj(sleep_item)
+    return s.SleepResult.parse_obj(sleep_item)
+
 
 @sleep_router.get("/date/{day}", response_model=s.SleepDB)
 def get_sleep_item_by_date(
@@ -80,14 +81,13 @@ def get_sleep_item_by_date(
     _: s.UserDB = Depends(get_current_user),
 ):
     day_str = day.split("T")[0]
-    sleep_by_day = list(
-        db.SleepDB.find({"created_at": {"$regex": f".*{day_str}.*"}})
-    )
+    sleep_by_day = list(db.SleepDB.find({"created_at": {"$regex": f".*{day_str}.*"}}))
 
     if not sleep_by_day:
         return s.SleepDB(sleep_item=[o for o in sleep_by_day])
 
     return s.SleepDB(sleep_item=[s.SleepDB.parse_obj(o) for o in sleep_by_day])
+
 
 @sleep_router.delete("/{id}", response_model=s.DeleteMessage)
 def get_delete_user(

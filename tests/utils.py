@@ -17,7 +17,7 @@ def fill_db_by_test_data(db: Database, test_data: TestData):
         u.password_hash = make_hash(u.password)
         db.users.insert_one(u.dict(exclude={"password": True}))
 
-    with open("tests/test_sleep.json") as sleep_file:
+    with open("tests/test_sleep_items.json") as sleep_file:
         sleep_data = json.load(sleep_file)
 
         for sleep_item in sleep_data:

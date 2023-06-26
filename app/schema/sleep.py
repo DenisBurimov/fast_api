@@ -111,15 +111,6 @@ class SleepDB(DbObject, SleepBase):
         json_encoders = {ObjectId: lambda v: str(v)}
 
 
-class SleepList(BaseModel):
-    sleep_items: list[SleepDB]
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: lambda v: str(v)}
-
-
 """
 {"_id":{"$oid":"640a17f89d770e182aced59a"},
 "sleepLastNight": int, // sleep duration
@@ -145,3 +136,12 @@ class SleepResult(BaseModel):
     focusTimeline: list
     createdAt: str | None = datetime.now().isoformat()
     v: int | None = 0
+
+
+class SleepList(BaseModel):
+    sleep_items: list[SleepResult]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: lambda v: str(v)}
