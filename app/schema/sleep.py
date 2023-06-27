@@ -37,7 +37,7 @@ class StepsSampleItem(BaseModel):
 
 class DataFromIOS(BaseModel):
     # sleep_sample: list[SleepSampleItem] = Field(alias="StepsSample")
-    StepsSample: list[SleepSampleItem]
+    SleepSample: list[SleepSampleItem]
     AccelerometerSample: list[AccelerometerSampleItem]
     StepsSample: list[StepsSampleItem]
 
