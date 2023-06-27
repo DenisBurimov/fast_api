@@ -151,7 +151,7 @@ def test_get_burn_item_by_id(client_a: TestClient, db: Database, test_data: Test
 
 
 def test_get_burn_item_by_time(client_a: TestClient, db: Database, test_data: TestData):
-    exact_time = TEST_BURN_ITEMS[0].created_at
+    exact_time = db.burn_items.find_one().get("created_at")
     response = client_a.get(f"api/burn/time/{exact_time}")
     assert response.status_code == 200
     assert s.BurnResultDB.parse_obj(response.json()).created_at == exact_time

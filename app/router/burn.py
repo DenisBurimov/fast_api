@@ -43,7 +43,7 @@ def ml_response(data):
 def add_burn_item(
     data: s.BurnBase,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
     """
     Rename incoming schema to BurnRaw
@@ -59,7 +59,14 @@ def add_burn_item(
     # data_json = dict(body=json.dumps(data.dict()))
 
     burn_result = ml_response(data)
-    res: results.InsertOneResult = db.burn_items.insert_one(burn_result.dict())
+    # res: results.InsertOneResult = db.burn_items.insert_one(burn_result.dict())
+    res: results.InsertOneResult = db.burn_items.insert_one(
+        {
+            "user_id": str(current_user.id),
+            "burnResponse": [x for x in burn_result.burnResponse],
+            "logBookResponse": [x for x in burn_result.logBookResponse],
+        }
+    )
     log(log.INFO, "Burn item [%s] has been saved", res.inserted_id)
     return s.BurnResult.parse_obj(db.burn_items.find_one({"_id": res.inserted_id}))
 
@@ -84,9 +91,11 @@ def get_burn_items(
 def get_burn_item_by_id(
     id: str,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
-    burn_item = db.burn_items.find_one({"_id": ObjectId(id)})
+    burn_item = db.burn_items.find_one(
+        {"_id": ObjectId(id), "user_id": str(current_user.id)}
+    )
     if not burn_item:
         raise HTTPException(status_code=404, detail="This burn item was not found")
 
@@ -97,9 +106,11 @@ def get_burn_item_by_id(
 def get_burn_item_by_time(
     created: str,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
-    burn_item = db.burn_items.find_one({"created_at": created})
+    burn_item = db.burn_items.find_one(
+        {"created_at": created, "user_id": str(current_user.id)}
+    )
     if not burn_item:
         raise HTTPException(status_code=404, detail="This burn item was not found")
 
@@ -110,11 +121,16 @@ def get_burn_item_by_time(
 def get_burn_item_by_date(
     day: str,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
     day_str = day.split("T")[0]
     burns_by_day = list(
-        db.burn_items.find({"created_at": {"$regex": f".*{day_str}.*"}})
+        db.burn_items.find(
+            {
+                "created_at": {"$regex": f".*{day_str}.*"},
+                "user_id": str(current_user.id),
+            }
+        )
     )
 
     if not burns_by_day:
@@ -127,9 +143,13 @@ def get_burn_item_by_date(
 def get_burn_X_items(
     items_number: int,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
-    last_items = list(db.burn_items.find().sort("created_at", -1).limit(items_number))
+    last_items = list(
+        db.burn_items.find({"user_id": str(current_user.id)})
+        .sort("created_at", -1)
+        .limit(items_number)
+    )
 
     if not last_items:
         return s.BurnList(burn_items=[o for o in last_items])
@@ -142,9 +162,11 @@ def update_burn_item(
     id: str,
     data: s.BurnUpdate,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
-    burn_item = db.burn_items.find_one({"_id": ObjectId(id)})
+    burn_item = db.burn_items.find_one(
+        {"_id": ObjectId(id), "user_id": str(current_user.id)}
+    )
     if not burn_item:
         raise HTTPException(status_code=404, detail="This burn item was not found")
 
