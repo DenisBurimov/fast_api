@@ -59,7 +59,6 @@ def add_burn_item(
     # data_json = dict(body=json.dumps(data.dict()))
 
     burn_result = ml_response(data)
-    # res: results.InsertOneResult = db.burn_items.insert_one(burn_result.dict())
     res: results.InsertOneResult = db.burn_items.insert_one(
         {
             "user_id": str(current_user.id),
