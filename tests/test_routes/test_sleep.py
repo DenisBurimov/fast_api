@@ -139,8 +139,12 @@ TEST_SLEEP_ITEMS = [
     ),
 ]
 
-with open("tests/test_sleep.json") as f:
-    data = json.load(f)
+with open("tests/test_sleep.json") as input_file:
+    input_data = json.load(input_file)
+
+
+with open("tests/test_sleep_items.json") as output_file:
+    db_data = json.load(output_file)
 
 
 def test_create_sleep_item(client_a: TestClient, db: Database, monkeypatch):
@@ -150,22 +154,20 @@ def test_create_sleep_item(client_a: TestClient, db: Database, monkeypatch):
     monkeypatch.setattr("app.router.sleep.ml_response", mock_ml_response)
     response = client_a.post(
         "api/sleep/add",
-        json=data[0],
+        json=input_data[0],
     )
     assert response.status_code == 201
 
 
 def test_get_all_sleep_items(client_a: TestClient, db: Database):
-    db.sleep_items.insert_many(x.dict() for x in TEST_SLEEP_ITEMS)
     response = client_a.get("api/sleep/all")
     assert response.status_code == 200
     sleep_items_list = s.SleepList.parse_obj(response.json())
     assert sleep_items_list
-    assert len(sleep_items_list.sleep_items) == len(data)
+    assert len(sleep_items_list.sleep_items) == len(db_data)
 
 
 def test_get_sleep_item_by_id(client_a: TestClient, db: Database):
-    db.sleep_items.insert_many(x.dict() for x in TEST_SLEEP_ITEMS)
     item_to_get_id = db.sleep_items.find_one().get("_id")
     response = client_a.get(f"api/sleep/{str(item_to_get_id)}")
     assert response.status_code == 200
@@ -176,7 +178,6 @@ def test_get_sleep_item_by_id(client_a: TestClient, db: Database):
 
 
 def test_get_sleep_item_by_date(client_a: TestClient, db: Database):
-    db.sleep_items.insert_many(x.dict() for x in TEST_SLEEP_ITEMS)
     item_to_get_id = db.sleep_items.find_one().get("createdAt")
     response = client_a.get(f"api/sleep/date/{str(item_to_get_id)}")
     assert response.status_code == 200

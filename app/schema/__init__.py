@@ -8,7 +8,14 @@ from .user import (
     UserDbWithPasswd,
     UserOut,
 )
-from .sleep import SleepBase, SleepDB, SleepList, SleepResult
+from .sleep import (
+    SleepBase,
+    SleepDB,
+    SleepList,
+    SleepResult,
+    SleepSampleItem,
+    FocusTimeLineItem,
+)
 from .burn import (
     BurnBase,
     BurnDB,

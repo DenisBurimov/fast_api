@@ -42,10 +42,7 @@ def ml_response(data):
         FunctionName="oculo-sleep",
         Payload=json.dumps(data),
     )
-    print(response["Payload"])
-    print(response["Payload"].read().decode("utf-8"))
-    log(log.DEBUG, "response payload: %s", response.get("Payload"))
-    log(log.DEBUG, "response payload: %s", response.get("Payload"))
+    log(log.DEBUG, "response payload: %s", response.get("Payload").decode("utf-8"))
 
     try:
         sleep_result = s.SleepResult.parse_raw(ml_response.read().decode("utf-8"))
@@ -62,10 +59,18 @@ def ml_response(data):
 def add_sleep_item(
     data: s.SleepBase,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
     sleep_result = ml_response(data)
-    res: results.InsertOneResult = db.sleep_items.insert_one(sleep_result.dict())
+    # res: results.InsertOneResult = db.sleep_items.insert_one(sleep_result.dict())
+    res: results.InsertOneResult = db.sleep_items.insert_one(
+        {
+            "user_id": str(current_user.id),
+            "sleepLastNight": sleep_result.sleepLastNight,
+            "sleepTimeline": [x.dict() for x in sleep_result.sleepTimeline],
+            "focusTimeline": [x.dict() for x in sleep_result.focusTimeline],
+        }
+    )
 
     log(log.INFO, "Sleep item [%s] has been saved", res.inserted_id)
     return s.SleepResult.parse_obj(db.sleep_items.find_one({"_id": res.inserted_id}))
@@ -74,10 +79,13 @@ def add_sleep_item(
 @sleep_router.get("/all", response_model=s.SleepList)
 def get_sleep_items(
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
     return s.SleepList(
-        sleep_items=[s.SleepResult.parse_obj(o) for o in db.sleep_items.find()]
+        sleep_items=[
+            s.SleepResult.parse_obj(o)
+            for o in db.sleep_items.find({"user_id": str(current_user.id)})
+        ]
     )
 
 

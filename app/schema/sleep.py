@@ -142,6 +142,7 @@ class FocusTimeLineItem(BaseModel):
 
 
 class SleepResult(BaseModel):
+    user_id: str | None
     sleepLastNight: int
     sleepTimeline: list[SleepTimeLineItem]
     focusTimeline: list[FocusTimeLineItem]
