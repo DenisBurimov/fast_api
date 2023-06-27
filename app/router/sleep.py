@@ -81,21 +81,23 @@ def get_sleep_items(
     db: Database = Depends(get_db),
     current_user: s.UserDB = Depends(get_current_user),
 ):
-    return s.SleepList(
-        sleep_items=[
-            s.SleepResult.parse_obj(o)
-            for o in db.sleep_items.find({"user_id": str(current_user.id)})
-        ]
-    )
+    users_sleep_items = [
+        s.SleepResult.parse_obj(o)
+        for o in db.sleep_items.find({"user_id": str(current_user.id)})
+    ]
+    log(log.INFO, "[%s] user's sleep items retrieved", len(users_sleep_items))
+    return s.SleepList(sleep_items=users_sleep_items)
 
 
 @sleep_router.get("/{id}", response_model=s.SleepResult)
 def get_sleep_item_by_id(
     id: str,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
-    sleep_item = db.sleep_items.find_one({"_id": ObjectId(id)})
+    sleep_item = db.sleep_items.find_one(
+        {"_id": ObjectId(id), "user_id": str(current_user.id)}
+    )
     if not sleep_item:
         raise HTTPException(status_code=404, detail="This sleep item was not found")
 
@@ -106,10 +108,17 @@ def get_sleep_item_by_id(
 def get_sleep_item_by_date(
     day: str,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
     day_str = day.split("T")[0]
-    sleep_by_day = list(db.SleepDB.find({"created_at": {"$regex": f".*{day_str}.*"}}))
+    sleep_by_day = list(
+        db.SleepDB.find(
+            {
+                "created_at": {"$regex": f".*{day_str}.*"},
+                "user_id": str(current_user.id),
+            }
+        )
+    )
 
     if not sleep_by_day:
         return s.SleepList(sleep_items=[o for o in sleep_by_day])
@@ -121,9 +130,14 @@ def get_sleep_item_by_date(
 def get_delete_user(
     id: str,
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
-    res: results.DeleteResult = db.sleep_items.delete_one({"_id": ObjectId(id)})
+    res: results.DeleteResult = db.sleep_items.delete_one(
+        {
+            "_id": ObjectId(id),
+            "user_id": str(current_user.id),
+        }
+    )
     if not res.deleted_count:
         raise HTTPException(status_code=404, detail="This user was not found")
 

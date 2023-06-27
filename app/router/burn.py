@@ -25,7 +25,6 @@ def ml_response(data):
     )
     ml_response = requests.post(
         ML_URL,
-        # json=data_json,
         json=data.dict(),
     )
 
@@ -68,12 +67,17 @@ def add_burn_item(
 @burn_router.get("/all", response_model=s.BurnList)
 def get_burn_items(
     db: Database = Depends(get_db),
-    _: s.UserDB = Depends(get_current_user),
+    current_user: s.UserDB = Depends(get_current_user),
 ):
-    all_burn_items = list(db.burn_items.find())
-    if not all_burn_items:
-        return s.BurnList(burn_items=[o for o in all_burn_items])
-    return s.BurnList(burn_items=[s.BurnResultDB.parse_obj(o) for o in all_burn_items])
+    users_burn_items = [
+        s.BurnResult.parse_obj(o)
+        for o in list(db.burn_items.find({"user_id": str(current_user.id)}))
+    ]
+    if not users_burn_items:
+        return s.BurnList(burn_items=[])
+
+    log(log.INFO, "[%s] user's sleep items retrieved", len(users_burn_items))
+    return s.BurnList(burn_items=users_burn_items)
 
 
 @burn_router.get("/id/{id}", response_model=s.BurnResultDB)

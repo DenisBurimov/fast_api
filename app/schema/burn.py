@@ -129,6 +129,7 @@ class logBookRecord(BaseModel):
 
 
 class BurnResult(BaseModel):
+    user_id: str | None
     burnResponse: BurnResponse
     logBookResponse: list[logBookRecord]
     created_at: str | None = datetime.now().isoformat()
