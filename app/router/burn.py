@@ -63,7 +63,7 @@ def add_burn_item(
         {
             "user_id": str(current_user.id),
             "burnResponse": [x for x in burn_result.burnResponse],
-            "logBookResponse": [x for x in burn_result.logBookResponse],
+            "logBookResponse": [x.dict() for x in burn_result.logBookResponse],
         }
     )
     log(log.INFO, "Burn item [%s] has been saved", res.inserted_id)

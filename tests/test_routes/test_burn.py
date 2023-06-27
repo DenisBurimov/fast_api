@@ -113,11 +113,32 @@ with open("tests/test_burn_items.json") as output_file:
     output_data = json.load(output_file)
 
 
-def test_create_burn_item_with_logbook(client_a: TestClient, db: Database, monkeypatch):
+def test_create_burn_item_without_logbook(
+    client_a: TestClient, db: Database, monkeypatch
+):
     burn_items_number_before = db.burn_items.count_documents({})
 
     def mock_ml_response(data):
         return TEST_BURN_ITEMS[0]
+
+    monkeypatch.setattr("app.router.burn.ml_response", mock_ml_response)
+
+    with open("tests/test_burn.json") as f:
+        data = json.load(f)
+    response = client_a.post(
+        "api/burn/add",
+        json=data,
+    )
+    burn_items_number_after = db.burn_items.count_documents({})
+    assert response.status_code == 201
+    assert burn_items_number_after == burn_items_number_before + 1
+
+
+def test_create_burn_item_with_logbook(client_a: TestClient, db: Database, monkeypatch):
+    burn_items_number_before = db.burn_items.count_documents({})
+
+    def mock_ml_response(data):
+        return TEST_BURN_ITEMS[1]
 
     monkeypatch.setattr("app.router.burn.ml_response", mock_ml_response)
 
