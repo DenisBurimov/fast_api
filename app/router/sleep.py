@@ -9,6 +9,7 @@ import app.schema as s
 from app.config import Settings, get_settings
 from app.dependency import get_current_user
 from app.logger import log
+from pydantic import ValidationError
 
 sleep_router = APIRouter(prefix="/sleep", tags=["SleepDB"])
 
@@ -42,12 +43,28 @@ def ml_response(data):
         FunctionName="oculo-sleep",
         Payload=json.dumps(data),
     )
-    log(log.DEBUG, "response payload: %s", response.get("Payload").decode("utf-8"))
+    # Read the response payload as bytes
+    response_payload = response['Payload'].read()
+
+    # Decode the response payload assuming it's in UTF-8 encoding
+    decoded_payload = response_payload.decode('utf-8')
+
+    log(log.DEBUG, "response payload: %s", decoded_payload)
 
     try:
-        sleep_result = s.SleepResult.parse_raw(ml_response.read().decode("utf-8"))
-    except Exception:
-        log(log.ERROR, "ML connection error: %s", ml_response.read().decode("utf-8"))
+        payload_data = json.loads(decoded_payload)["body"]
+        sleep_result_data = {
+            "sleepLastNight": payload_data["sleepLastNight"],
+            "sleepTimeline": payload_data["sleepTimeline"],
+            "focusTimeline": payload_data["focusTimeline"]
+        }
+        sleep_result = s.SleepResult(**sleep_result_data)
+        log(log.INFO, "SleepResult object created successfully: %s", sleep_result)
+    except ValidationError as e:
+        log(log.ERROR, "Validation error: %s", e)
+        raise HTTPException(status_code=400, detail="Invalid ML model response")
+    except Exception as e:
+        log(log.ERROR, "ML connection error: %s", e)
         raise HTTPException(status_code=400, detail="ML model bad request")
 
     return sleep_result

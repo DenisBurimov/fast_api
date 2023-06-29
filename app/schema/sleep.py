@@ -6,7 +6,7 @@ from bson.objectid import ObjectId
 from .db_object import DbObject
 
 
-class SleepSampleValue(str, enum.Enum):
+class SleepSampleValue(int):
     inBed = 0
     asleepUnspecified = 1
     awake = 2
@@ -37,9 +37,9 @@ class StepsSampleItem(BaseModel):
 
 class DataFromIOS(BaseModel):
     # sleep_sample: list[SleepSampleItem] = Field(alias="StepsSample")
-    SleepSample: list[SleepSampleItem]
-    AccelerometerSample: list[AccelerometerSampleItem]
-    StepsSample: list[StepsSampleItem]
+    SleepSample: list[SleepSampleItem] | None
+    AccelerometerSample: list[AccelerometerSampleItem] | None
+    StepsSample: list[StepsSampleItem] | None
 
 
 class SleepBody(BaseModel):
