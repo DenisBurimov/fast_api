@@ -6,7 +6,7 @@ from bson.objectid import ObjectId
 from .db_object import DbObject
 
 
-class SleepSampleValue(enum.Enum):
+class SleepSampleValue(str, enum.Enum):
     inBed = 0
     asleepUnspecified = 1
     awake = 2
