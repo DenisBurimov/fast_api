@@ -86,13 +86,22 @@ def add_sleep_item(
     current_user: s.UserDB = Depends(get_current_user),
 ):
     sleep_result = ml_response(data)
-    # res: results.InsertOneResult = db.sleep_items.insert_one(sleep_result.dict())
+    sleep_time_line = (
+        [x.dict() for x in sleep_result.sleepTimeline]
+        if sleep_result.sleepTimeline
+        else None
+    )
+    focus_time_tine = (
+        [x.dict() for x in sleep_result.focusTimeline]
+        if sleep_result.focusTimeline
+        else None
+    )
     res: results.InsertOneResult = db.sleep_items.insert_one(
         {
             "user_id": str(current_user.id),
             "sleepLastNight": sleep_result.sleepLastNight,
-            "sleepTimeline": [x.dict() for x in sleep_result.sleepTimeline],
-            "focusTimeline": [x.dict() for x in sleep_result.focusTimeline],
+            "sleepTimeline": sleep_time_line,
+            "focusTimeline": focus_time_tine,
         }
     )
 
