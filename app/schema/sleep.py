@@ -1,4 +1,3 @@
-import enum
 from datetime import datetime
 from pydantic import BaseModel  # , Field
 from bson.objectid import ObjectId
@@ -143,9 +142,9 @@ class FocusTimeLineItem(BaseModel):
 
 class SleepResult(BaseModel):
     user_id: str | None
-    sleepLastNight: int
-    sleepTimeline: list[SleepTimeLineItem]
-    focusTimeline: list[FocusTimeLineItem]
+    sleepLastNight: int | None
+    sleepTimeline: list[SleepTimeLineItem] | None
+    focusTimeline: list[FocusTimeLineItem] | None
     createdAt: str | None = datetime.now().isoformat()
     v: int | None = 0
 

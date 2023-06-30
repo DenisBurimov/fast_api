@@ -44,19 +44,26 @@ def ml_response(data):
         Payload=json.dumps(data),
     )
     # Read the response payload as bytes
-    response_payload = response['Payload'].read()
+    response_payload = response["Payload"].read()
 
     # Decode the response payload assuming it's in UTF-8 encoding
-    decoded_payload = response_payload.decode('utf-8')
+    decoded_payload = response_payload.decode("utf-8")
 
     log(log.DEBUG, "response payload: %s", decoded_payload)
 
     try:
-        payload_data = json.loads(decoded_payload)["body"]
+        payload_raw_data = json.loads(decoded_payload)
+        # We don't decode at once in case there is no body field
+        # Method get allows us to get None if there is no body
+        payload_data = payload_raw_data.get("body")
+        # Schema changed to accept None so we do if there is no payload data
+        sleep_last_night = payload_data["sleepLastNight"] if payload_data else None
+        sleep_time_line = payload_data["sleepTimeline"] if payload_data else None
+        focus_time_tine = payload_data["focusTimeline"] if payload_data else None
         sleep_result_data = {
-            "sleepLastNight": payload_data["sleepLastNight"],
-            "sleepTimeline": payload_data["sleepTimeline"],
-            "focusTimeline": payload_data["focusTimeline"]
+            "sleepLastNight": sleep_last_night,
+            "sleepTimeline": sleep_time_line,
+            "focusTimeline": focus_time_tine,
         }
         sleep_result = s.SleepResult(**sleep_result_data)
         log(log.INFO, "SleepResult object created successfully: %s", sleep_result)
