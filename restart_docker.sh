@@ -5,12 +5,6 @@ if [ $? -eq 0 ]
 then
     docker-compose down
     docker-compose up -d
-    if [ $? -eq 0]
-    then
-        echo "Containers have been started successfully"
-    else
-        echo Exit code: $?
-    fi
 else
     echo Build failed
 fi
