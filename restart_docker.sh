@@ -10,5 +10,7 @@ then
         echo "Containers have been started successfully"
     else
         echo Exit code: $?
+    fi
 else
     echo Build failed
+fi
