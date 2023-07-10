@@ -20,16 +20,6 @@ settings: Settings = get_settings()
 
 
 def ml_response(data):
-    # ML_URL = (
-    #     settings.SLEEP_MODEL_URL
-    #     if settings.ENV_MODE == "production"
-    #     else settings.SLEEP_MODEL_URL_LOCAL
-    # )
-    # ml_response = requests.post(
-    #     ML_URL,
-    #     # json=data_json,
-    #     json=data.dict(),
-    # )
 
     AWS_REGION = "us-east-1"
     client = boto3.client(
@@ -87,6 +77,12 @@ def add_sleep_item(
     db: Database = Depends(get_db),
     current_user: s.UserDB = Depends(get_current_user),
 ):
+    
+    current_date = datetime.now().isoformat().split("T")[0]
+    if db.sleep_items.find_one({"user_id": str(current_user.id), "created_at": {"$regex": f"^{re.escape(current_date)}.*$"}}):
+        db.sleep_items.delete_one({"user_id": str(current_user.id), "created_at": {"$regex": f"^{re.escape(current_date)}.*$"}})
+        log(log.INFO, "Sleep item for [%s] user and [%s] date has been deleted", current_user.id, current_date)
+        
     sleep_result = ml_response(data)
     sleep_time_line = (
         [x.dict() for x in sleep_result.sleepTimeline]
