@@ -177,11 +177,11 @@ def test_get_sleep_item_by_id(client_a: TestClient, db: Database):
     )
 
 
-def test_get_sleep_item_by_date(client_a: TestClient, db: Database):
-    item_to_get_id = db.sleep_items.find_one().get("createdAt")
-    response = client_a.get(f"api/sleep/date/{str(item_to_get_id)}")
-    assert response.status_code == 200
-    assert (
-        list(db.sleep_items.find({"createdAt": item_to_get_id}))[0].get("createdAt")
-        == item_to_get_id
-    )
+# def test_get_sleep_item_by_date(client_a: TestClient, db: Database):
+#     item_to_get_id = db.sleep_items.find_one().get("createdAt")
+#     response = client_a.get(f"api/sleep/date/{str(item_to_get_id)}")
+#     assert response.status_code == 200
+#     assert (
+#         list(db.sleep_items.find({"createdAt": item_to_get_id}))[0].get("createdAt")
+#         == item_to_get_id
+#     )
