@@ -143,8 +143,8 @@ class FocusTimeLineItem(BaseModel):
 class SleepResult(BaseModel):
     user_id: str | None
     sleepLastNight: int | None
-    sleepTimeline: list[SleepTimeLineItem] | None
-    focusTimeline: list[FocusTimeLineItem] | None
+    sleepTimeline: list
+    focusTimeline: list
     created_at: str | None = datetime.now().isoformat()
     v: int | None = 0
 
