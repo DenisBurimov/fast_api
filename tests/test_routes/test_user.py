@@ -86,3 +86,24 @@ def test_delete_user(client_a: TestClient, db: Database, test_data: TestData):
 
     users_number_after = db.users.count_documents({})
     assert users_number_before > users_number_after
+
+
+def test_refresh(client: TestClient, db: Database, test_data: TestData):
+    response = client.post(
+        "api/auth/login",
+        data=s.UserLogin(
+            username=test_data.test_users[0].name,
+            password=test_data.test_users[0].password,
+        ).dict(),
+    )
+    assert response
+    response_data = s.AuthTokens.parse_obj(response.json())
+    refresh_token: str = response_data.refresh_token.token
+    response = client.post(
+        "api/auth/refresh",
+        # data=s.Token(token=refresh_token, token_type="Bearer").dict(),
+        json=s.Token(token=refresh_token, token_type="Bearer").dict(),
+    )
+    assert response.status_code == 200
+    assert isinstance(response.json().get("token"), str)
+    assert len(response.json().get("token")) == 155

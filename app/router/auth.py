@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from pymongo.database import Database
 from pymongo import results
-
+from bson.objectid import ObjectId
 from app import get_db, hash_verify, make_hash
 import app.schema as s
 from app.logger import log
@@ -47,11 +47,11 @@ def username(
 
 @auth_router.post("/refresh", response_model=s.Token)
 def refresh(
-    refresh_token: str,
+    data: s.Token,
     db: Database = Depends(get_db),
 ):
-    refresh_token_data = verify_refresh_token(refresh_token)
-    user_db = db.users.find_one({"_id": refresh_token_data.user_id})
+    refresh_token_data = verify_refresh_token(data.token)
+    user_db = db.users.find_one({"_id": ObjectId(refresh_token_data.user_id)})
     user = s.UserDbWithPasswd.parse_obj(user_db) if user_db else None
 
     if not user or not refresh_token_data.password_hash == user.password_hash:
