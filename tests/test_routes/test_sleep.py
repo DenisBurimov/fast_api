@@ -148,8 +148,8 @@ with open("tests/test_sleep_items.json") as output_file:
 
 
 def test_create_sleep_item(client_a: TestClient, db: Database, monkeypatch):
-    def mock_ml_response(data):
-        return TEST_SLEEP_ITEMS[0]
+    def mock_ml_response(*args, **kwargs):
+        return s.SleepResult.parse_obj(TEST_SLEEP_ITEMS[0])
 
     monkeypatch.setattr("app.router.sleep.ml_response", mock_ml_response)
     response = client_a.post(

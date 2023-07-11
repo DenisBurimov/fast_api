@@ -19,7 +19,7 @@ sleep_router = APIRouter(prefix="/sleep", tags=["SleepDB"])
 settings: Settings = get_settings()
 
 
-def ml_response(data):
+def ml_response(data) -> s.SleepResult:
     AWS_REGION = "us-east-1"
     client = boto3.client(
         "lambda",

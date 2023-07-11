@@ -177,9 +177,15 @@ class SleepList(BaseModel):
 """
 
 
+class SleepTimeLineItem(BaseModel):
+    start: str = ""
+    end: str = ""
+    level: int = 0
+
+
 class SleepResult(BaseModel):
     sleepLastNight: int
-    sleepTimeline: list
-    focusTimeline: list
+    sleepTimeline: list[SleepTimeLineItem]
+    focusTimeline: list[SleepTimeLineItem]
     createdAt: str | None = datetime.now().isoformat()
     v: int | None = 0
