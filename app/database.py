@@ -21,6 +21,7 @@ MONGO_INITDB_ROOT_PASSWORD = settings.MONGO_INITDB_ROOT_PASSWORD
 # )
 mongo = MongoClient(settings.MONGO_URI, tlsCAFile=certifi.where())
 
+
 def get_db() -> Generator[Database, None, None]:
     # TODO: begin transaction
     yield mongo[settings.MONGO_DB]

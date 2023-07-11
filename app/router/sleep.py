@@ -20,7 +20,6 @@ settings: Settings = get_settings()
 
 
 def ml_response(data):
-
     AWS_REGION = "us-east-1"
     client = boto3.client(
         "lambda",
@@ -77,12 +76,26 @@ def add_sleep_item(
     db: Database = Depends(get_db),
     current_user: s.UserDB = Depends(get_current_user),
 ):
-    
     current_date = datetime.now().isoformat().split("T")[0]
-    if db.sleep_items.find_one({"user_id": str(current_user.id), "created_at": {"$regex": f"^{re.escape(current_date)}.*$"}}):
-        db.sleep_items.delete_one({"user_id": str(current_user.id), "created_at": {"$regex": f"^{re.escape(current_date)}.*$"}})
-        log(log.INFO, "Sleep item for [%s] user and [%s] date has been deleted", current_user.id, current_date)
-        
+    if db.sleep_items.find_one(
+        {
+            "user_id": str(current_user.id),
+            "created_at": {"$regex": f"^{re.escape(current_date)}.*$"},
+        }
+    ):
+        db.sleep_items.delete_one(
+            {
+                "user_id": str(current_user.id),
+                "created_at": {"$regex": f"^{re.escape(current_date)}.*$"},
+            }
+        )
+        log(
+            log.INFO,
+            "Sleep item for [%s] user and [%s] date has been deleted",
+            current_user.id,
+            current_date,
+        )
+
     sleep_result = ml_response(data)
     sleep_time_line = (
         [x.dict() for x in sleep_result.sleepTimeline]
@@ -100,7 +113,7 @@ def add_sleep_item(
             "sleepLastNight": sleep_result.sleepLastNight,
             "sleepTimeline": sleep_time_line,
             "focusTimeline": focus_time_tine,
-            "created_at": datetime.now().isoformat()
+            "created_at": datetime.now().isoformat(),
         }
     )
 
@@ -145,11 +158,11 @@ def get_sleep_item_by_date(
     day_str = day.split("T")[0]
 
     sleep_by_day = db.sleep_items.find_one(
-            {
-                "created_at": {"$regex": f"^{re.escape(day_str)}.*$"},
-                "user_id": str(current_user.id)
-            }
-        )
+        {
+            "created_at": {"$regex": f"^{re.escape(day_str)}.*$"},
+            "user_id": str(current_user.id),
+        }
+    )
 
     if not sleep_by_day:
         raise HTTPException(status_code=404, detail="No sleep found for this day")

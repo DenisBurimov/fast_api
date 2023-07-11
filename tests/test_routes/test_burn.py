@@ -154,6 +154,7 @@ def test_create_burn_item_with_logbook(client_a: TestClient, db: Database, monke
 
 
 def test_get_all_burn_items(client_a: TestClient, db: Database, test_data: TestData):
+    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
     response = client_a.get("api/burn/all")
     assert response.status_code == 200
     burn_items_list = s.BurnList.parse_obj(response.json())
@@ -162,6 +163,7 @@ def test_get_all_burn_items(client_a: TestClient, db: Database, test_data: TestD
 
 
 def test_get_burn_item_by_id(client_a: TestClient, db: Database, test_data: TestData):
+    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
     item_to_get_id = db.burn_items.find_one().get("_id")
     response = client_a.get(f"api/burn/id/{str(item_to_get_id)}")
     assert response.status_code == 200

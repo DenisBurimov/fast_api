@@ -156,3 +156,30 @@ class SleepList(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: lambda v: str(v)}
+
+
+"""
+{"_id":{"$oid":"640a17f89d770e182aced59a"},
+"sleepLastNight": int, // sleep duration
+"sleepTimeline": [{"start": str, "end": str},
+                    {"start": str, "end": str},
+                    {"start": str, "end": str},
+                    {"start": str, "end": str}]
+"focusTimeline": [{"start": str, "end": str, "level": 0},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2}]
+"createdAt":{"$date":{"$numberLong":"1678383096251"}},
+"__v":{"$numberInt":"0"}}
+"""
+
+
+class SleepResult(BaseModel):
+    sleepLastNight: int
+    sleepTimeline: list
+    focusTimeline: list
+    createdAt: str | None = datetime.now().isoformat()
+    v: int | None = 0
