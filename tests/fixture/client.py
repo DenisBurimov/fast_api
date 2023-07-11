@@ -55,5 +55,5 @@ def client_a(
 
     assert response and response.status_code == 200
     login_response = s.AuthTokens.parse_obj(response.json())
-    client.headers["Authorization"] = f"Bearer {login_response.access_token}"
+    client.headers["Authorization"] = f"Bearer {login_response.access_token.token}"
     yield client
