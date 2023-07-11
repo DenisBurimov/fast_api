@@ -129,52 +129,19 @@ class SleepDB(DbObject, SleepBase):
 """
 
 
-class SleepTimeLineItem(BaseModel):
-    start: str
-    end: str
-
-
 class FocusTimeLineItem(BaseModel):
     start: str
     end: str
     level: int
 
 
-class SleepResult(BaseModel):
-    user_id: str | None
-    sleepLastNight: int | None
-    sleepTimeline: list
-    focusTimeline: list
-    created_at: str | None = datetime.now().isoformat()
-    v: int | None = 0
-
-
-class SleepList(BaseModel):
-    sleep_items: list[SleepResult]
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: lambda v: str(v)}
-
-
-"""
-{"_id":{"$oid":"640a17f89d770e182aced59a"},
-"sleepLastNight": int, // sleep duration
-"sleepTimeline": [{"start": str, "end": str},
-                    {"start": str, "end": str},
-                    {"start": str, "end": str},
-                    {"start": str, "end": str}]
-"focusTimeline": [{"start": str, "end": str, "level": 0},
-                    {"start": str, "end": str, "level": 1},
-                    {"start": str, "end": str, "level": 2},
-                    {"start": str, "end": str, "level": 1},
-                    {"start": str, "end": str, "level": 2},
-                    {"start": str, "end": str, "level": 1},
-                    {"start": str, "end": str, "level": 2}]
-"createdAt":{"$date":{"$numberLong":"1678383096251"}},
-"__v":{"$numberInt":"0"}}
-"""
+# class SleepResult(BaseModel):
+#     user_id: str | None
+#     sleepLastNight: int | None
+#     sleepTimeline: list
+#     focusTimeline: list
+#     created_at: str | None = datetime.now().isoformat()
+#     v: int | None = 0
 
 
 class SleepTimeLineItem(BaseModel):
@@ -189,3 +156,12 @@ class SleepResult(BaseModel):
     focusTimeline: list[SleepTimeLineItem]
     createdAt: str | None = datetime.now().isoformat()
     v: int | None = 0
+
+
+class SleepList(BaseModel):
+    sleep_items: list[SleepResult]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: lambda v: str(v)}
