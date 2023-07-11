@@ -101,7 +101,6 @@ def test_refresh(client: TestClient, db: Database, test_data: TestData):
     refresh_token: str = response_data.refresh_token.token
     response = client.post(
         "api/auth/refresh",
-        # data=s.Token(token=refresh_token, token_type="Bearer").dict(),
         json=s.Token(token=refresh_token, token_type="Bearer").dict(),
     )
     assert response.status_code == 200
