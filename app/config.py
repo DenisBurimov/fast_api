@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     BURN_MODEL_URL_LOCAL: str
     SLEEP_MODEL_URL: str
     SLEEP_MODEL_URL_LOCAL: str
+    AWS_ACCESS_KEY: str
+    AWS_SECRET_KEY: str
 
     class Config:
         env_file = ["project.env", ".env"]

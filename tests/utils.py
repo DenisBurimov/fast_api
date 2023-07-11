@@ -17,11 +17,21 @@ def fill_db_by_test_data(db: Database, test_data: TestData):
         u.password_hash = make_hash(u.password)
         db.users.insert_one(u.dict(exclude={"password": True}))
 
-    with open("tests/test_sleep.json") as sleep_file:
+    with open("tests/test_sleep_items.json") as sleep_file:
         sleep_data = json.load(sleep_file)
 
+        TEST_USER = db.users.find_one({"email": test_data.test_users[0].email})
         for sleep_item in sleep_data:
+            sleep_item["user_id"] = str(TEST_USER["_id"])
             db.sleep_items.insert_one(sleep_item)
+
+    with open("tests/test_burn_items.json") as burn_file:
+        burn_data = json.load(burn_file)
+
+        TEST_USER = db.users.find_one({"email": test_data.test_users[0].email})
+        for burn_item in burn_data:
+            burn_item["user_id"] = str(TEST_USER["_id"])
+            db.burn_items.insert_one(s.BurnResult.parse_obj(burn_item).dict())
 
     with open("tests/test_logbook.json") as f:
         logbook_data = json.load(f)

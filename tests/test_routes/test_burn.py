@@ -109,8 +109,13 @@ TEST_BURN_ITEMS = [
     ),
 ]
 
+with open("tests/test_burn_items.json") as output_file:
+    output_data = json.load(output_file)
 
-def test_create_burn_item_with_logbook(client_a: TestClient, db: Database, monkeypatch):
+
+def test_create_burn_item_without_logbook(
+    client_a: TestClient, db: Database, monkeypatch
+):
     burn_items_number_before = db.burn_items.count_documents({})
 
     def mock_ml_response(data):
@@ -118,12 +123,29 @@ def test_create_burn_item_with_logbook(client_a: TestClient, db: Database, monke
 
     monkeypatch.setattr("app.router.burn.ml_response", mock_ml_response)
 
-    # with open("tests/burn_example.json") as f:
     with open("tests/test_burn.json") as f:
         data = json.load(f)
     response = client_a.post(
         "api/burn/add",
-        # json=test_data.test_burn_items[0].dict(),
+        json=data,
+    )
+    burn_items_number_after = db.burn_items.count_documents({})
+    assert response.status_code == 201
+    assert burn_items_number_after == burn_items_number_before + 1
+
+
+def test_create_burn_item_with_logbook(client_a: TestClient, db: Database, monkeypatch):
+    burn_items_number_before = db.burn_items.count_documents({})
+
+    def mock_ml_response(data):
+        return TEST_BURN_ITEMS[1]
+
+    monkeypatch.setattr("app.router.burn.ml_response", mock_ml_response)
+
+    with open("tests/test_burn.json") as f:
+        data = json.load(f)
+    response = client_a.post(
+        "api/burn/add",
         json=data,
     )
     burn_items_number_after = db.burn_items.count_documents({})
@@ -137,7 +159,7 @@ def test_get_all_burn_items(client_a: TestClient, db: Database, test_data: TestD
     assert response.status_code == 200
     burn_items_list = s.BurnList.parse_obj(response.json())
     assert burn_items_list
-    assert len(burn_items_list.burn_items) == len(TEST_BURN_ITEMS)
+    assert len(burn_items_list.burn_items) == len(output_data)
 
 
 def test_get_burn_item_by_id(client_a: TestClient, db: Database, test_data: TestData):
@@ -152,9 +174,7 @@ def test_get_burn_item_by_id(client_a: TestClient, db: Database, test_data: Test
 
 
 def test_get_burn_item_by_time(client_a: TestClient, db: Database, test_data: TestData):
-    exact_time = TEST_BURN_ITEMS[0].created_at
-    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
-
+    exact_time = db.burn_items.find_one().get("created_at")
     response = client_a.get(f"api/burn/time/{exact_time}")
     assert response.status_code == 200
     assert s.BurnResultDB.parse_obj(response.json()).created_at == exact_time
@@ -162,11 +182,9 @@ def test_get_burn_item_by_time(client_a: TestClient, db: Database, test_data: Te
 
 def test_get_burn_item_by_date(client_a: TestClient, db: Database, test_data: TestData):
     today = datetime.today().isoformat()
-    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
-
     response = client_a.get(f"api/burn/date/{today}")
     assert response.status_code == 200
-    assert len(s.BurnList.parse_obj(response.json()).burn_items) == 2
+    assert len(s.BurnList.parse_obj(response.json()).burn_items) == len(output_data)
 
 
 def test_get_X_burn_items(client_a: TestClient, db: Database, test_data: TestData):
@@ -179,7 +197,6 @@ def test_get_X_burn_items(client_a: TestClient, db: Database, test_data: TestDat
 
 
 def test_update_burn_item(client_a: TestClient, db: Database, test_data: TestData):
-    db.burn_items.insert_many(x.dict() for x in TEST_BURN_ITEMS)
     item_to_update = db.burn_items.find_one().get("_id")
     logBookResponse = [
         {"activity": "meditation", "value": 50, "timing": 5},

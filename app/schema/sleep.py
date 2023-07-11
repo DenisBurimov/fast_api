@@ -1,4 +1,3 @@
-import enum
 from datetime import datetime
 from pydantic import BaseModel  # , Field
 from bson.objectid import ObjectId
@@ -6,7 +5,7 @@ from bson.objectid import ObjectId
 from .db_object import DbObject
 
 
-class SleepSampleValue(enum.Enum):
+class SleepSampleValue(int):
     inBed = 0
     asleepUnspecified = 1
     awake = 2
@@ -37,9 +36,9 @@ class StepsSampleItem(BaseModel):
 
 class DataFromIOS(BaseModel):
     # sleep_sample: list[SleepSampleItem] = Field(alias="StepsSample")
-    StepsSample: list[SleepSampleItem]
-    AccelerometerSample: list[AccelerometerSampleItem]
-    StepsSample: list[StepsSampleItem]
+    SleepSample: list[SleepSampleItem] | None
+    AccelerometerSample: list[AccelerometerSampleItem] | None
+    StepsSample: list[StepsSampleItem] | None
 
 
 class SleepBody(BaseModel):
@@ -111,8 +110,47 @@ class SleepDB(DbObject, SleepBase):
         json_encoders = {ObjectId: lambda v: str(v)}
 
 
+"""
+{"_id":{"$oid":"640a17f89d770e182aced59a"},
+"sleepLastNight": int, // sleep duration
+"sleepTimeline": [{"start": str, "end": str},
+                    {"start": str, "end": str},
+                    {"start": str, "end": str},
+                    {"start": str, "end": str}]
+"focusTimeline": [{"start": str, "end": str, "level": 0},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2},
+                    {"start": str, "end": str, "level": 1},
+                    {"start": str, "end": str, "level": 2}]
+"createdAt":{"$date":{"$numberLong":"1678383096251"}},
+"__v":{"$numberInt":"0"}}
+"""
+
+
+class SleepTimeLineItem(BaseModel):
+    start: str
+    end: str
+
+
+class FocusTimeLineItem(BaseModel):
+    start: str
+    end: str
+    level: int
+
+
+class SleepResult(BaseModel):
+    user_id: str | None
+    sleepLastNight: int | None
+    sleepTimeline: list[SleepTimeLineItem] | None
+    focusTimeline: list[FocusTimeLineItem] | None
+    created_at: str | None = datetime.now().isoformat()
+    v: int | None = 0
+
+
 class SleepList(BaseModel):
-    sleep_items: list[SleepDB]
+    sleep_items: list[SleepResult]
 
     class Config:
         allow_population_by_field_name = True
