@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     ENV_MODE: str
     JWT_SECRET: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    ACCESS_TOKEN_EXPIRE_DAYS: int
     ADMIN_USER: str = "admin"
     ADMIN_PASS: str = "admin"
     ADMIN_EMAIL: EmailStr = "admin@admin.com"

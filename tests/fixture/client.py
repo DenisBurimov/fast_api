@@ -33,8 +33,8 @@ def authorized_users_tokens(
         )
 
         assert response and response.status_code == 200
-        token = s.Token.parse_obj(response.json())
-        tokens += [token]
+        login_response = s.AuthTokens.parse_obj(response.json())
+        tokens += [login_response.access_token]
     yield tokens
 
 
@@ -54,6 +54,6 @@ def client_a(
     )
 
     assert response and response.status_code == 200
-    token = s.Token.parse_obj(response.json())
-    client.headers["Authorization"] = f"Bearer {token.access_token}"
+    login_response = s.AuthTokens.parse_obj(response.json())
+    client.headers["Authorization"] = f"Bearer {login_response.access_token}"
     yield client

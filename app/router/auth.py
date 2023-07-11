@@ -7,12 +7,12 @@ from app import get_db, hash_verify, make_hash
 import app.schema as s
 from app.logger import log
 
-from app.oauth2 import create_access_token
+from app.oauth2 import create_access_token, create_refresh_token, verify_refresh_token
 
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@auth_router.post("/login", response_model=s.Token)
+@auth_router.post("/login", response_model=s.AuthTokens)
 def username(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Database = Depends(get_db),
@@ -30,12 +30,40 @@ def username(
         log(log.ERROR, "User [%s] was not authenticated", user_credentials.username)
         raise HTTPException(status_code=403, detail="Invalid credentials")
 
-    access_token = create_access_token(data={"user_id": str(user.id)})
-
-    return s.Token(
-        access_token=access_token,
+    access_token = s.Token(
+        token=create_access_token(data={"user_id": str(user.id)}),
         token_type="Bearer",
     )
+
+    refresh_token = s.Token(
+        token=create_refresh_token(
+            data={"user_id": str(user.id), "password_hash": user.password_hash}
+        ),
+        token_type="Bearer",
+    )
+
+    return s.AuthTokens(access_token=access_token, refresh_token=refresh_token)
+
+
+@auth_router.post("/refresh", response_model=s.Token)
+def refresh(
+    refresh_token: str,
+    db: Database = Depends(get_db),
+):
+    refresh_token_data = verify_refresh_token(refresh_token)
+    user_db = db.users.find_one({"_id": refresh_token_data.user_id})
+    user = s.UserDbWithPasswd.parse_obj(user_db) if user_db else None
+
+    if not user or not refresh_token_data.password_hash == user.password_hash:
+        log(log.ERROR, "User [%s] was not authenticated", user.name)
+        raise HTTPException(status_code=403, detail="Invalid credentials")
+
+    access_token = s.Token(
+        token=create_access_token(data={"user_id": str(user.id)}),
+        token_type="Bearer",
+    )
+
+    return access_token
 
 
 @auth_router.post(

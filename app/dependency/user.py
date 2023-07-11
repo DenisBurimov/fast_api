@@ -4,7 +4,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from pymongo.database import Database
 
-from app.oauth2 import verify_access_token, INVALID_CREDENTIALS_EXCEPTION
+from app.oauth2 import verify_access_token
 from app.database import get_db
 import app.schema as s
 
@@ -15,5 +15,5 @@ def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Database = Depends(get_db),
 ) -> s.UserDB:
-    token: s.TokenData = verify_access_token(token, INVALID_CREDENTIALS_EXCEPTION)
+    token: s.TokenData = verify_access_token(token)
     return s.UserDB.parse_obj(db.users.find_one({"_id": ObjectId(token.user_id)}))
