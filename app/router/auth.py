@@ -2,17 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from pymongo.database import Database
 from pymongo import results
-from bson.objectid import ObjectId
+from app.dependency import get_current_user_by_refresh_token
 from app import get_db, hash_verify, make_hash
 import app.schema as s
 from app.logger import log
 
-from app.oauth2 import create_access_token, create_refresh_token, verify_refresh_token
+from app.oauth2 import create_access_token, create_refresh_token
 
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@auth_router.post("/login", response_model=s.AuthTokens)
+@auth_router.post("/login", response_model=s.Tokens)
 def username(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Database = Depends(get_db),
@@ -31,37 +31,24 @@ def username(
         log(log.ERROR, "User [%s] was not authenticated", user_credentials.username)
         raise HTTPException(status_code=403, detail="Invalid credentials")
 
-    access_token = s.Token(
-        token=create_access_token(data={"user_id": str(user.id)}),
-        token_type="Bearer",
-    )
-
-    refresh_token = s.Token(
-        token=create_refresh_token(
+    tokens = s.Tokens(
+        access_token=create_access_token(data={"user_id": str(user.id)}),
+        refresh_token=create_refresh_token(
             data={"user_id": str(user.id), "password_hash": user.password_hash}
         ),
         token_type="Bearer",
     )
+    return tokens
 
-    return s.AuthTokens(access_token=access_token, refresh_token=refresh_token)
 
-
-@auth_router.post("/refresh", response_model=s.Token)
+@auth_router.post("/refresh", response_model=s.Tokens)
 def refresh(
-    data: s.Token,
     db: Database = Depends(get_db),
+    current_user: s.UserDB = Depends(get_current_user_by_refresh_token),
 ):
     """ """
-    refresh_token_data = verify_refresh_token(data.token)
-    user_db = db.users.find_one({"_id": ObjectId(refresh_token_data.user_id)})
-    user = s.UserDbWithPasswd.parse_obj(user_db) if user_db else None
-
-    if not user or not refresh_token_data.password_hash == user.password_hash:
-        log(log.ERROR, "User [%s] was not authenticated", user.name)
-        raise HTTPException(status_code=403, detail="Invalid credentials")
-
-    access_token = s.Token(
-        token=create_access_token(data={"user_id": str(user.id)}),
+    access_token = s.Tokens(
+        access_token=create_access_token(data={"user_id": str(current_user.id)}),
         token_type="Bearer",
     )
 

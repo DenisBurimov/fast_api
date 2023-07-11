@@ -27,4 +27,4 @@ from .burn import (
 )
 from .logbook import JournalBase, JournalDB, JournalList
 from .delete_message import DeleteMessage
-from .token import Token, TokenData, RefreshTokenData, AuthTokens
+from .token import Tokens, TokenData, RefreshTokenData

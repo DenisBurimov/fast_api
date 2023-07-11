@@ -62,7 +62,7 @@ def create_refresh_token(data: dict) -> str:
     return encoded_jwt_refresh_token
 
 
-def verify_refresh_token(token: str) -> s.RefreshTokenData:
+def decode_refresh_token(token: str) -> s.RefreshTokenData:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET)
         id: str = payload.get("user_id")

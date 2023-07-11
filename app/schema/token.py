@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 
 
-class Token(BaseModel):
-    token: str
+class Tokens(BaseModel):
+    access_token: str
+    refresh_token: str | None
     token_type: str
 
 
@@ -13,8 +14,3 @@ class TokenData(BaseModel):
 class RefreshTokenData(BaseModel):
     user_id: str = None
     password_hash: str = None
-
-
-class AuthTokens(BaseModel):
-    access_token: Token
-    refresh_token: Token

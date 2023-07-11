@@ -21,7 +21,7 @@ def authorized_users_tokens(
     client: TestClient,
     db: Database,
     test_data: TestData,
-) -> Generator[list[s.Token], None, None]:
+) -> Generator[list[s.Tokens], None, None]:
     tokens = []
     for user in test_data.test_authorized_users:
         response = client.post(
@@ -33,7 +33,7 @@ def authorized_users_tokens(
         )
 
         assert response and response.status_code == 200
-        login_response = s.AuthTokens.parse_obj(response.json())
+        login_response = s.Tokens.parse_obj(response.json())
         tokens += [login_response.access_token]
     yield tokens
 
@@ -54,6 +54,6 @@ def client_a(
     )
 
     assert response and response.status_code == 200
-    login_response = s.AuthTokens.parse_obj(response.json())
-    client.headers["Authorization"] = f"Bearer {login_response.access_token.token}"
+    login_response = s.Tokens.parse_obj(response.json())
+    client.headers["Authorization"] = f"Bearer {login_response.access_token}"
     yield client

@@ -97,12 +97,12 @@ def test_refresh(client: TestClient, db: Database, test_data: TestData):
         ).dict(),
     )
     assert response
-    response_data = s.AuthTokens.parse_obj(response.json())
-    refresh_token: str = response_data.refresh_token.token
+    response_data = s.Tokens.parse_obj(response.json())
+    refresh_token: str = response_data.refresh_token
     response = client.post(
         "api/auth/refresh",
-        json=s.Token(token=refresh_token, token_type="Bearer").dict(),
+        headers={"Authorization": f"Bearer {refresh_token}"},
     )
     assert response.status_code == 200
-    assert isinstance(response.json().get("token"), str)
-    assert len(response.json().get("token")) == 155
+    assert isinstance(response.json().get("access_token"), str)
+    assert len(response.json().get("access_token")) == 155
