@@ -17,6 +17,7 @@ def username(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Database = Depends(get_db),
 ):
+    """ """
     res = db.users.find_one(
         {
             "$or": [
@@ -50,6 +51,7 @@ def refresh(
     data: s.Token,
     db: Database = Depends(get_db),
 ):
+    """ """
     refresh_token_data = verify_refresh_token(data.token)
     user_db = db.users.find_one({"_id": ObjectId(refresh_token_data.user_id)})
     user = s.UserDbWithPasswd.parse_obj(user_db) if user_db else None

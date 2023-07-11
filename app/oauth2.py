@@ -22,7 +22,7 @@ NEED_REFRESH_TOKEN = HTTPException(
 
 INVALID_REFRESH_TOKEN = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Invalid refresh token. Could not validate credentials",
+    detail="Invalid refresh token. Could not validate credentials. Please login again.",
     headers={"WWW-Authenticate": "Bearer"},
 )
 
