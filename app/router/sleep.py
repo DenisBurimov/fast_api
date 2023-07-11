@@ -10,6 +10,8 @@ from app.config import Settings, get_settings
 from app.dependency import get_current_user
 from app.logger import log
 from pydantic import ValidationError
+from datetime import datetime
+import re
 
 sleep_router = APIRouter(prefix="/sleep", tags=["SleepDB"])
 
@@ -18,16 +20,6 @@ settings: Settings = get_settings()
 
 
 def ml_response(data):
-    # ML_URL = (
-    #     settings.SLEEP_MODEL_URL
-    #     if settings.ENV_MODE == "production"
-    #     else settings.SLEEP_MODEL_URL_LOCAL
-    # )
-    # ml_response = requests.post(
-    #     ML_URL,
-    #     # json=data_json,
-    #     json=data.dict(),
-    # )
 
     AWS_REGION = "us-east-1"
     client = boto3.client(
@@ -85,6 +77,12 @@ def add_sleep_item(
     db: Database = Depends(get_db),
     current_user: s.UserDB = Depends(get_current_user),
 ):
+    
+    current_date = datetime.now().isoformat().split("T")[0]
+    if db.sleep_items.find_one({"user_id": str(current_user.id), "created_at": {"$regex": f"^{re.escape(current_date)}.*$"}}):
+        db.sleep_items.delete_one({"user_id": str(current_user.id), "created_at": {"$regex": f"^{re.escape(current_date)}.*$"}})
+        log(log.INFO, "Sleep item for [%s] user and [%s] date has been deleted", current_user.id, current_date)
+        
     sleep_result = ml_response(data)
     sleep_time_line = (
         [x.dict() for x in sleep_result.sleepTimeline]
@@ -102,6 +100,7 @@ def add_sleep_item(
             "sleepLastNight": sleep_result.sleepLastNight,
             "sleepTimeline": sleep_time_line,
             "focusTimeline": focus_time_tine,
+            "created_at": datetime.now().isoformat()
         }
     )
 
@@ -137,26 +136,25 @@ def get_sleep_item_by_id(
     return s.SleepResult.parse_obj(sleep_item)
 
 
-@sleep_router.get("/date/{day}", response_model=s.SleepList)
+@sleep_router.get("/date/{day}", response_model=s.SleepResult)
 def get_sleep_item_by_date(
     day: str,
     db: Database = Depends(get_db),
     current_user: s.UserDB = Depends(get_current_user),
 ):
     day_str = day.split("T")[0]
-    sleep_by_day = list(
-        db.SleepDB.find(
+
+    sleep_by_day = db.sleep_items.find_one(
             {
-                "created_at": {"$regex": f".*{day_str}.*"},
-                "user_id": str(current_user.id),
+                "created_at": {"$regex": f"^{re.escape(day_str)}.*$"},
+                "user_id": str(current_user.id)
             }
         )
-    )
 
     if not sleep_by_day:
-        return s.SleepList(sleep_items=[o for o in sleep_by_day])
+        raise HTTPException(status_code=404, detail="No sleep found for this day")
 
-    return s.SleepList(sleep_items=[s.SleepResult.parse_obj(o) for o in sleep_by_day])
+    return s.SleepResult.parse_obj(sleep_by_day)
 
 
 @sleep_router.delete("/{id}", response_model=s.DeleteMessage)
