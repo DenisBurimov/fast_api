@@ -37,6 +37,9 @@ def username(
             data={"user_id": str(user.id), "password_hash": user.password_hash}
         ),
         token_type="Bearer",
+    # user_details = (
+        
+    # )
     )
     return tokens
 
@@ -47,12 +50,17 @@ def refresh(
     current_user: s.UserDB = Depends(get_current_user_by_refresh_token),
 ):
     """ """
-    access_token = s.Tokens(
+    res = db.users.find_one({"_id": current_user.id})
+    user = s.UserDbWithPasswd.parse_obj(res) if res else None
+    tokens = s.Tokens(
         access_token=create_access_token(data={"user_id": str(current_user.id)}),
+        refresh_token=create_refresh_token(
+            data={"user_id": str(current_user.id), "password_hash": user.password_hash}
+        ),
         token_type="Bearer",
     )
 
-    return access_token
+    return tokens
 
 
 @auth_router.post(

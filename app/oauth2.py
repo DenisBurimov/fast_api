@@ -26,7 +26,6 @@ INVALID_REFRESH_TOKEN = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
-
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
