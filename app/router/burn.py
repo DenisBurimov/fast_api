@@ -138,6 +138,34 @@ def get_burn_item_by_date(
     return s.BurnList(burn_items=[s.BurnResultDB.parse_obj(o) for o in burns_by_day])
 
 
+@burn_router.get("/date_range/{start_date}/{end_date}", response_model=s.BurnList)
+def get_burn_items_by_date_range(
+    start_date: str,
+    end_date: str,
+    db: Database = Depends(get_db),
+    current_user: s.UserDB = Depends(get_current_user),
+):
+    # Split the dates at the "T" and append the time for the start and end of the day
+    start_date_str = start_date.split("T")[0] + "T00:00:00"
+    end_date_str = end_date.split("T")[0] + "T23:59:59"
+
+    # Query for burn items within the date range
+    burns_in_range = list(
+        db.burn_items.find(
+            {
+                "created_at": {
+                    "$gte": start_date_str,
+                    "$lte": end_date_str,
+                },
+                "user_id": str(current_user.id),
+            }
+        )
+    )
+
+    # Return the burn items
+    return s.BurnList(burn_items=[s.BurnResultDB.parse_obj(o) for o in burns_in_range])
+
+
 @burn_router.get("/last/{items_number}", response_model=s.BurnList)
 def get_burn_X_items(
     items_number: int,

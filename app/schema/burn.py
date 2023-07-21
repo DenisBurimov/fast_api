@@ -102,8 +102,7 @@ class BurnResponseRange(str, enum.Enum):
 class BurnResponse(BaseModel):
     burn: float
     reaction_time: float
-    gaze_uniformity: float
-    peak_velocity: float
+    eye_speed: float
     range: BurnResponseRange
     time: str
 
@@ -131,7 +130,7 @@ class logBookRecord(BaseModel):
 class BurnResult(BaseModel):
     user_id: str | None
     burnResponse: BurnResponse
-    logBookResponse: list[logBookRecord]
+    logBookResponse: list[logBookRecord] | None
     created_at: str | None = datetime.now().isoformat()
     v: int | None = 0
 

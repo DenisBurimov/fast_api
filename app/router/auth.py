@@ -31,17 +31,17 @@ def username(
         log(log.ERROR, "User [%s] was not authenticated", user_credentials.username)
         raise HTTPException(status_code=403, detail="Invalid credentials")
 
-    tokens = s.Tokens(
+    user_details = s.Tokens(
         access_token=create_access_token(data={"user_id": str(user.id)}),
         refresh_token=create_refresh_token(
             data={"user_id": str(user.id), "password_hash": user.password_hash}
         ),
         token_type="Bearer",
-    # user_details = (
-        
-    # )
+        id = str(user.id),
+        created_at = user.created_at
     )
-    return tokens
+    
+    return user_details
 
 
 @auth_router.post("/refresh", response_model=s.Tokens)
@@ -72,6 +72,15 @@ def sign_up(
     data: s.UserCreate,
     db: Database = Depends(get_db),
 ):
+    res = db.users.find_one(
+        (
+            {"email": data.email}
+        )
+    )  
+    if res:
+        log(log.ERROR, "User [%s] already exists", data.email)
+        raise HTTPException(status_code=400, detail="User already exists")
+    
     data.password_hash = make_hash(data.password)
     res: results.InsertOneResult = db.users.insert_one(
         data.dict(exclude={"password": True})

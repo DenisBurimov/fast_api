@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field, validator
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
+from datetime import datetime
 
 
 """
@@ -58,8 +59,9 @@ class LogBookActivityItem(BaseModel):
 
 
 class JournalBase(BaseModel):
+    note: str | None
     activities: list[LogBookActivityItem]
-    createdAt: str | None
+    createdAt: str | None = datetime.now().isoformat()
     v: int | None = Field(alias="__v")
 
     @validator("v", pre=True)

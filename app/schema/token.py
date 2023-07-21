@@ -5,6 +5,8 @@ class Tokens(BaseModel):
     access_token: str
     refresh_token: str | None
     token_type: str
+    id: str | None = None
+    created_at: str | None = None
 
 
 class TokenData(BaseModel):
