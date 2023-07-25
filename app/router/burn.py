@@ -200,7 +200,7 @@ def update_burn_item(
     data.v = 1 if not burn_item.get("v") else burn_item["v"] + 1
     db.burn_items.update_one(
         {"_id": ObjectId(id)},
-        {"$set": data.dict(exclude_none=True)},
+        {"logBookResponse": data.dict(exclude_none=True)},
     )
 
     return s.BurnResultDB.parse_obj(db.burn_items.find_one({"_id": ObjectId(id)}))

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel  # , Field
 from bson.objectid import ObjectId
 
@@ -154,7 +154,7 @@ class SleepResult(BaseModel):
     sleepLastNight: int
     sleepTimeline: list[SleepTimeLineItem]
     focusTimeline: list[SleepTimeLineItem]
-    createdAt: str | None = datetime.now().isoformat()
+    createdAt: str | None = datetime.now(timezone.utc).isoformat()
     v: int | None = 0
 
 

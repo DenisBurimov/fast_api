@@ -10,7 +10,7 @@ from app.config import Settings, get_settings
 from app.dependency import get_current_user
 from app.logger import log
 from pydantic import ValidationError
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 
 sleep_router = APIRouter(prefix="/sleep", tags=["SleepDB"])
@@ -113,7 +113,7 @@ def add_sleep_item(
             "sleepLastNight": sleep_result.sleepLastNight,
             "sleepTimeline": sleep_time_line,
             "focusTimeline": focus_time_tine,
-            "created_at": datetime.now().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }
     )
 

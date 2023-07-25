@@ -1,5 +1,5 @@
 import enum
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel, EmailStr
 from bson.objectid import ObjectId
 
@@ -29,8 +29,8 @@ class UserBase(BaseModel):
     name: str
     activities: list[UserActivities] | None = []
     goals: list[UsersGoals] | None = []
-    created_at: str = datetime.now().isoformat()
-    updated_at: str = datetime.now().isoformat()
+    created_at: str = datetime.now(timezone.utc).isoformat()
+    updated_at: str = datetime.now(timezone.utc).isoformat()
 
 
 class UserOut(BaseModel):
@@ -39,8 +39,8 @@ class UserOut(BaseModel):
     activities: list[UserActivities]
     goals: list[UsersGoals]
     v: int | None
-    created_at: str = datetime.now().isoformat()
-    updated_at: str = datetime.now().isoformat()
+    created_at: str = datetime.now(timezone.utc).isoformat()
+    updated_at: str = datetime.now(timezone.utc).isoformat()
 
 
 class UserCreate(UserBase):
@@ -62,7 +62,7 @@ class UserUpdate(BaseModel):
     activities: list[UserActivities] | None
     goals: list[UsersGoals] | None
     v: int | None
-    updated_at: str | None = datetime.now().isoformat()
+    updated_at: str | None = datetime.now(timezone.utc).isoformat()
 
 
 class UserDB(DbObject, UserBase):

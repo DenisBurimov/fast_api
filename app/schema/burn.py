@@ -1,5 +1,5 @@
 import enum
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Union
 from pydantic import BaseModel  # , Field
 from bson.objectid import ObjectId
@@ -131,7 +131,7 @@ class BurnResult(BaseModel):
     user_id: str | None
     burnResponse: BurnResponse
     logBookResponse: list[logBookRecord] | None
-    created_at: str | None = datetime.now().isoformat()
+    created_at: str | None = datetime.now(timezone.utc).isoformat()
     v: int | None = 0
 
 
