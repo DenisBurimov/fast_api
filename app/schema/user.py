@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime, timezone
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from bson.objectid import ObjectId
 
 from .db_object import DbObject
@@ -29,8 +29,12 @@ class UserBase(BaseModel):
     name: str
     activities: list[UserActivities] | None = []
     goals: list[UsersGoals] | None = []
-    created_at: str = datetime.now(timezone.utc).isoformat()
-    updated_at: str = datetime.now(timezone.utc).isoformat()
+    created_at: str | None = None
+    updated_at: str | None = None
+
+    @validator("created_at", "updated_at", pre=True, always=True)
+    def set_created_updated(cls, v):
+        return v or datetime.now(timezone.utc).isoformat()
 
 
 class UserOut(BaseModel):
@@ -39,13 +43,25 @@ class UserOut(BaseModel):
     activities: list[UserActivities]
     goals: list[UsersGoals]
     v: int | None
-    created_at: str = datetime.now(timezone.utc).isoformat()
-    updated_at: str = datetime.now(timezone.utc).isoformat()
+    created_at: str | None = None
+    updated_at: str | None = None
 
 
 class UserCreate(UserBase):
     password: str
     password_hash: str | None = ""
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "email": "user@example.com",
+                "name": "string",
+                "activities": [],
+                "goals": [],
+                "password": "string",
+                "password_hash": ""
+            }
+        }
 
 
 class UserLogin(BaseModel):
@@ -62,7 +78,11 @@ class UserUpdate(BaseModel):
     activities: list[UserActivities] | None
     goals: list[UsersGoals] | None
     v: int | None
-    updated_at: str | None = datetime.now(timezone.utc).isoformat()
+    updated_at: str | None = None
+    
+    @validator("updated_at", pre=True, always=True)
+    def set_updated(cls, v):
+        return v or datetime.now(timezone.utc).isoformat()
 
 
 class UserDB(DbObject, UserBase):
