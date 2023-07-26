@@ -51,19 +51,7 @@ class UserCreate(UserBase):
     password: str
     password_hash: str | None = ""
     
-    class Config:
-        schema_extra = {
-            "example": {
-                "email": "user@example.com",
-                "name": "string",
-                "activities": [],
-                "goals": [],
-                "password": "string",
-                "password_hash": ""
-            }
-        }
-
-
+    
 class UserLogin(BaseModel):
     """fields should match to properties of OAuth2PasswordRequestForm"""
 
